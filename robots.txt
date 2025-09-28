@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://shushushu-san.github.io/sitemap.xml
+
+# 推奨されるクロール間隔
+Crawl-delay: 1
