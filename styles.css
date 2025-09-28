@@ -100,3 +100,39 @@ h1, h2 {
     font-style: italic;
     margin-bottom: 1rem;
 }
+
+/* ブログページのレイアウト */
+@media (min-width: 992px) {
+    .blog-main {
+        padding-right: 15px;
+    }
+    
+    .blog-sidebar {
+        padding-left: 15px;
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+}
+
+/* サイドバーのカード */
+.blog-sidebar .card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+}
+
+.blog-sidebar .card-header {
+    background-color: #f8f9fa;
+}
+
+/* 記事カード */
+article .card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+    transition: transform 0.2s ease-in-out;
+}
+
+article .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
