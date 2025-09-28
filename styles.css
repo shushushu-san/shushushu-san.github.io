@@ -158,19 +158,19 @@ article .card:hover {
 
 /* 技術カテゴリ別の色分け */
 .tech-stack .badge.tech-3d {
-    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    background: linear-gradient(45deg, #ff0000, #927777) !important;
 }
 
 .tech-stack .badge.tech-design {
-    background: linear-gradient(45deg, #007bff, #6610f2) !important;
+    background: linear-gradient(45deg, #ff0000, #927777) !important;
 }
 
 .tech-stack .badge.tech-software {
-    background: linear-gradient(45deg, #17a2b8, #6f42c1) !important;
+    background: linear-gradient(45deg, #ff0000, #927777) !important;
 }
 
 .tech-stack .badge.tech-status {
-    background: linear-gradient(45deg, #ffc107, #fd7e14) !important;
+    background: linear-gradient(45deg, #ff0000, #927777) !important;
     color: #000;
 }
 
