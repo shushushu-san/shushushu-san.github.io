@@ -1,3 +1,48 @@
+/* フォント設定 */
+:root {
+    --primary-font: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic Medium', 'Yu Gothic', 'Meiryo', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    --heading-font: 'Hiragino Mincho ProN', 'Hiragino Mincho Pro', 'Yu Mincho', 'YuMincho', 'Noto Serif JP', 'Times New Roman', serif;
+    --code-font: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', 'Courier', monospace;
+}
+
+/* 基本フォント設定 */
+body {
+    font-family: var(--primary-font);
+    font-size: 16px;
+    line-height: 1.7;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    padding-bottom: 60px; /* フッター用の余白 */
+}
+
+/* 見出し用フォント */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--heading-font);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+}
+
+/* 英語テキスト用クラス */
+.en-text {
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: 0.01em;
+}
+
+/* 日本語テキスト用クラス */
+.ja-text {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic Medium', 'Yu Gothic', 'Meiryo', sans-serif;
+    letter-spacing: 0.05em;
+}
+
+/* コード用フォント */
+code, pre, kbd, samp {
+    font-family: var(--code-font);
+    font-size: 0.9em;
+}
+
 /* レスポンシブデザイン用のメディアクエリ */
 @media (max-width: 768px) {
     .container {
@@ -23,9 +68,6 @@
 }
 
 /* フッターの位置調整 */
-body {
-    padding-bottom: 60px;
-}
 
 .fixed-bottom {
     height: 60px;
@@ -51,7 +93,7 @@ a:hover {
 
 /* 見出しのスタイル */
 h1, h2 {
-    color: #333;
+    color: #a56a6a;
 }
 
 .fst-italic {
