@@ -1,0 +1,60 @@
+/* レスポンシブデザイン用のメディアクエリ */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .display-5 {
+        font-size: 2rem;
+    }
+}
+
+/* ヘッダーのスタイル調整 */
+.navbar-brand {
+    font-weight: bold;
+    color: #dc3545 !important;
+}
+
+/* メインコンテンツの調整 */
+.bg-body-secondary {
+    background-color: #f8f9fa !important;
+    border: 1px solid #dee2e6;
+}
+
+/* フッターの位置調整 */
+body {
+    padding-bottom: 60px;
+}
+
+.fixed-bottom {
+    height: 60px;
+    display: flex;
+    align-items: center;
+}
+
+/* リンクのスタイル */
+a {
+    color: #dc3545;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #b02a37;
+    text-decoration: underline;
+}
+
+/* コンテナの余白調整 */
+.container {
+    max-width: 1200px;
+}
+
+/* 見出しのスタイル */
+h1, h2 {
+    color: #333;
+}
+
+.fst-italic {
+    font-style: italic;
+    margin-bottom: 1rem;
+}
