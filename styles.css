@@ -320,6 +320,18 @@ article .card:hover {
     color: white;
 }
 
+/* BOOTH用 */
+.btn-social.btn-booth {
+    background: linear-gradient(45deg, #fc4d50, #e63946);
+    color: white;
+    border-color: #fc4d50;
+}
+
+.btn-social.btn-booth:hover {
+    background: linear-gradient(45deg, #e63946, #d62828);
+    color: white;
+}
+
 /* ダウンロードボタン */
 .btn-download {
     background: linear-gradient(45deg, #28a745, #20c997);
@@ -339,4 +351,18 @@ article .card:hover {
     color: white;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+/* 小さいサイズのボタン */
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.btn-custom.btn-sm,
+.btn-custom-outline.btn-sm,
+.btn-social.btn-sm,
+.btn-download.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
 }
