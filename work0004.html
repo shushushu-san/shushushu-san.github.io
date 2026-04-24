@@ -147,10 +147,10 @@
                         <li><strong>スマホ</strong>: 画面下の方向ボタンで操作</li>
                         <li>光っている単位アイテムに触れると単位を取得できる</li>
                         <li>黒い怪物に当たると<strong>敵の大きさに応じて単位を落とす</strong>（残機は減らない）</li>
-                        <li>✊ たまに<strong>「大学当局に抗議する」バナー</strong>が流れてくる。取ると／ 65%成功・35%弾圧（残機-1）。／ 3回成功で残機全回復・+40単位・検閲と弾圧が無効化！／ 3回弾圧されると逮捕 Game Over！</li>
+                        <li>✊ たまに<strong>「大学当局に抗議する」バナー</strong>が流れてくる。取ると／ 25%成功・75%弾圧（残機-1）。／ 3回成功で残機全回復・+40単位・検閲と弾圧が無効化！／ 3回弾圧されると逮捕 Game Over！</li>
                         <li>💰 <strong>バイト</strong>（右下）: 1単位 を落とすが ¥1,000 GET</li>
                         <li>🟣 <strong>密造単位購入</strong>（右下）: ¥200 → 1単位　　※25%の確率で検閲・全単位没収。<strong>3回検閲で逮捕 Game Over！</strong></li>
-                        <li>60秒でできるだけ多くの単位を集めよう！</li>
+                        <li>90秒でできるだけ多くの単位を集めよう！</li>
                         <li>最終スコアによってエンディングが 5 種類変化する</li>
                     </ul>
                 </div>
@@ -205,7 +205,7 @@ const player = {
    ================================================================ */
 let credits          = 0;
 let money            = 0;       // 所持金（円）
-let timeLeft         = 60;
+let timeLeft         = 90;
 let enemies          = [];
 let items            = [];
 let particles        = [];
@@ -472,7 +472,7 @@ function spawnProtestItem() {
 }
 
 function resolveProtest(x, y) {
-    if (Math.random() < 0.65) {
+    if (Math.random() < 0.25) {
         protestSuccessCount++;
         spawnProtestSuccess(x, y);
         if (protestSuccessCount >= 3) {
@@ -521,7 +521,7 @@ function updateBgStars(dt) {
 function initGame() {
     credits         = 0;
     money           = 0;
-    timeLeft        = 60;
+    timeLeft        = 90;
     player.x        = W / 2;
     player.y        = H / 2;
     player.lives    = 3;
@@ -551,23 +551,23 @@ function initGame() {
 function getEnding() {
     if (credits >= 124) return {
         rank: 'S', rankColor: '#ffd700',
-        title: '完全卒業！優等生！',
+        title: '完全卒業！おめでとう！',
         subtitle: '124単位以上を取得！最高の結果です！',
-        lines: ['4年間の努力が実を結びました。', '輝かしい未来へ羽ばたこう！'],
+        lines: ['研究第一！研究第一！', '低い給料でも研究室に残るタイプの優等生ですね。', 'きっと大学からも大切にされるでしょう。'],
         bg: '#05100a', panelBorder: '#ffd700'
     };
     if (credits >= 80) return {
         rank: 'A', rankColor: '#2ecc71',
         title: 'ご卒業おめでとう！',
         subtitle: '必要単位を取得して卒業しました',
-        lines: ['社会人としての新しい章が始まります。', '頑張ってください！'],
+        lines: ['モラトリアムは終わりです。', '社会人としての厳しい現実が始まります。'],
         bg: '#021208', panelBorder: '#2ecc71'
     };
     if (credits >= 50) return {
         rank: 'B', rankColor: '#f39c12',
         title: 'ギリギリ卒業...',
         subtitle: 'なんとか単位を揃えました',
-        lines: ['ギリギリですが卒業できました。', '今後はもう少し余裕を持って単位を取ろう。'],
+        lines: ['ギリギリですが卒業できました。', 'ひとまずお疲れ様でした。', 'バイトして密造単位を買えば余裕持って卒業できたのに...'],
         bg: '#120b00', panelBorder: '#f39c12'
     };
     if (credits >= 30) return {
@@ -575,7 +575,7 @@ function getEnding() {
         title: '留年確定...',
         subtitle: '単位が足りませんでした',
         lines: [`取得単位: ${credits}単位（あと${50 - credits}単位不足）`,
-                '来年また頑張りましょう。留年料の準備を...'],
+                '来年また頑張りましょう。留年料の準備を...', 'バイトして密造単位を買えばよかったのに...'],
         bg: '#120000', panelBorder: '#e74c3c'
     };
     return {
@@ -683,7 +683,7 @@ function update(dt) {
     // ── 敵 ───────────────────────────────
     enemySpawnTimer -= dt;
     if (enemySpawnTimer <= 0) {
-        const elapsed    = 60 - timeLeft;
+        const elapsed    = 90 - timeLeft;
         const maxEnemies = 3 + Math.floor(elapsed / 12);
         if (enemies.length < maxEnemies) spawnEnemy();
         enemySpawnTimer = Math.max(1.4, 4.0 - elapsed * 0.05);
@@ -789,7 +789,7 @@ function drawTitle(t) {
     ctx.fillStyle = '#cccccc';
     ctx.font = '17px sans-serif';
     ctx.fillText('黒い怪物を避けながら単位を集めよう！', W / 2, 182);
-    ctx.fillText('60秒でどれだけ単位を取れるかな？', W / 2, 208);
+    ctx.fillText('90秒でどれだけ単位を取れるかな？', W / 2, 208);
 
     ctx.fillStyle = '#999999';
     ctx.font = '13px sans-serif';
