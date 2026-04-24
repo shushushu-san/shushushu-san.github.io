@@ -146,7 +146,9 @@
                         <li><strong>PC</strong>: 矢印キー または <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> でプレイヤーを動かす</li>
                         <li><strong>スマホ</strong>: 画面下の方向ボタンで操作</li>
                         <li>光っている単位アイテムに触れると単位を取得できる</li>
-                        <li>黒い怪物に当たると残機が減る（当たった直後は一時的に無敵）</li>
+                        <li>黒い怪物に当たると残機が減り、<strong>敵の大きさに応じて単位を落とす</strong></li>
+                        <li>💰 <strong>単位を売る</strong>（右下）: 1単位 → ¥1,000</li>
+                        <li>🟣 <strong>密造単位購入</strong>（右下）: ¥200 → 1単位　※25%の確率で当局に検閲され、全単位没収！</li>
                         <li>60秒でできるだけ多くの単位を集めよう！</li>
                         <li>最終スコアによってエンディングが 5 種類変化する</li>
                     </ul>
@@ -175,6 +177,10 @@ const ctx    = canvas.getContext('2d');
 const W = canvas.width;   // 720
 const H = canvas.height;  // 450
 
+// ゲーム中右下ボタン定義
+const SELL_BTN = { x: 476, y: H - 48, w: 112, h: 38 };  // 1単位 → ¥1,000
+const BUY_BTN  = { x: 596, y: H - 48, w: 118, h: 38 };  // ¥200 → 1密造単位
+
 /* ================================================================
    ゲーム状態
    ================================================================ */
@@ -197,6 +203,7 @@ const player = {
    ゲーム変数
    ================================================================ */
 let credits          = 0;
+let money            = 0;       // 所持金（円）
 let timeLeft         = 60;
 let enemies          = [];
 let items            = [];
@@ -204,6 +211,7 @@ let particles        = [];
 let bgStars          = [];
 let itemSpawnTimer   = 0;
 let enemySpawnTimer  = 0;
+let censorFlash      = 0;       // 検閲エフェクトタイマー（秒）
 
 /* ================================================================
    キーボード入力
@@ -319,7 +327,7 @@ function spawnCollect(x, y, color, text) {
                      life: 1.1, maxLife: 1.1, radius: 0, color, text });
 }
 
-function spawnDamage(x, y) {
+function spawnDamage(x, y, lostUnits) {
     for (let i = 0; i < 16; i++) {
         const a = Math.random() * Math.PI * 2;
         particles.push({
@@ -333,6 +341,37 @@ function spawnDamage(x, y) {
     }
     particles.push({ x, y: y - 15, vx: 0, vy: -40,
                      life: 1.0, maxLife: 1.0, radius: 0, color: '#ff6b6b', text: 'いたい！' });
+    if (lostUnits > 0) {
+        particles.push({ x, y: y + 12, vx: 0, vy: -28,
+                         life: 1.3, maxLife: 1.3, radius: 0, color: '#ff9800',
+                         text: '−' + lostUnits + '単位' });
+    }
+}
+
+/* ================================================================
+   検閲エフェクト
+   ================================================================ */
+function spawnCensor() {
+    const lost = credits;
+    credits = 0;
+    censorFlash = 2.2;
+    for (let i = 0; i < 30; i++) {
+        const a = Math.random() * Math.PI * 2;
+        particles.push({
+            x: W / 2 + (Math.random() - 0.5) * 260,
+            y: H / 2 + (Math.random() - 0.5) * 180,
+            vx: Math.cos(a) * (70 + Math.random() * 130),
+            vy: Math.sin(a) * (70 + Math.random() * 130),
+            life: 1.4, maxLife: 1.4,
+            radius: 5 + Math.random() * 9,
+            color: '#cc0000', text: null
+        });
+    }
+    if (lost > 0) {
+        particles.push({ x: W / 2, y: H / 2 + 58, vx: 0, vy: -16,
+                         life: 2.8, maxLife: 2.8, radius: 0,
+                         color: '#ffcc00', text: lost + '単位 没収！' });
+    }
 }
 
 /* ================================================================
@@ -363,6 +402,7 @@ function updateBgStars(dt) {
    ================================================================ */
 function initGame() {
     credits         = 0;
+    money           = 0;
     timeLeft        = 60;
     player.x        = W / 2;
     player.y        = H / 2;
@@ -373,6 +413,7 @@ function initGame() {
     particles       = [];
     itemSpawnTimer  = 0;
     enemySpawnTimer = 0;
+    censorFlash     = 0;
 
     for (let i = 0; i < 3; i++) spawnEnemy();
     for (let i = 0; i < 4; i++) spawnItem();
@@ -468,6 +509,7 @@ function update(dt) {
                Math.min(H - player.radius,     player.y + dy * player.speed * dt));
 
     if (player.invincible > 0) player.invincible -= dt;
+    if (censorFlash > 0) censorFlash -= dt;
 
     // ── アイテム ──────────────────────────
     itemSpawnTimer -= dt;
@@ -532,7 +574,11 @@ function update(dt) {
             if (d < player.radius + e.radius - 5) {
                 player.lives--;
                 player.invincible = 2.0;
-                spawnDamage(player.x, player.y);
+                // 敵の大きさに応じて単位をドロップ
+                const lostUnits = Math.ceil(e.radius / 7);
+                const actual    = Math.min(credits, lostUnits);
+                credits = Math.max(0, credits - actual);
+                spawnDamage(player.x, player.y, actual);
                 if (player.lives <= 0) { gameState = STATE.ENDING; return; }
             }
         }
@@ -792,13 +838,18 @@ function drawGame() {
     roundRect(0, 0, W, 47, 0); ctx.fill();
 
     // 取得単位
-    ctx.fillStyle = '#ffd700'; ctx.font = 'bold 14px sans-serif';
+    ctx.fillStyle = '#ffd700'; ctx.font = 'bold 13px sans-serif';
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-    ctx.fillText('取得単位:', 12, 23);
-    ctx.font = 'bold 22px sans-serif';
-    ctx.fillText(String(credits), 90, 23);
-    ctx.fillStyle = '#bbbbbb'; ctx.font = '13px sans-serif';
-    ctx.fillText('単位', 90 + ctx.measureText(String(credits)).width + 3, 23);
+    ctx.fillText('取得単位:', 12, 14);
+    ctx.font = 'bold 19px sans-serif';
+    ctx.fillText(String(credits), 86, 14);
+    ctx.fillStyle = '#bbbbbb'; ctx.font = '12px sans-serif';
+    ctx.fillText('単位', 86 + ctx.measureText(String(credits)).width + 3, 14);
+
+    // 所持金
+    ctx.fillStyle = '#98fb98'; ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText('¥' + money.toLocaleString() + '円', 12, 34);
 
     // 残機
     ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif';
@@ -817,6 +868,59 @@ function drawGame() {
     ctx.fillText(Math.ceil(timeLeft) + '秒', W - 12, 22);
     ctx.fillStyle = '#aaaaaa'; ctx.font = '11px sans-serif';
     ctx.fillText('残り時間', W - 12, 38);
+
+    // ── 右下ボタン ──────────────────────
+
+    // 売却ボタン（💰 1単位 → ¥1,000）
+    const canSell = credits >= 1;
+    ctx.globalAlpha = canSell ? 1.0 : 0.45;
+    ctx.fillStyle = canSell ? '#2e7d32' : '#444444';
+    roundRect(SELL_BTN.x, SELL_BTN.y, SELL_BTN.w, SELL_BTN.h, 8); ctx.fill();
+    ctx.strokeStyle = '#81c784'; ctx.lineWidth = 1.5;
+    roundRect(SELL_BTN.x, SELL_BTN.y, SELL_BTN.w, SELL_BTN.h, 8); ctx.stroke();
+    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('💰 単位を売る', SELL_BTN.x + SELL_BTN.w / 2, SELL_BTN.y + 13);
+    ctx.fillStyle = '#a5d6a7'; ctx.font = '10px sans-serif';
+    ctx.fillText('1単位 → ¥1,000', SELL_BTN.x + SELL_BTN.w / 2, SELL_BTN.y + 27);
+    ctx.globalAlpha = 1;
+
+    // 密造購入ボタン（紫 ¥200 → 1密造単位）
+    const canBuy = money >= 200;
+    ctx.globalAlpha = canBuy ? 1.0 : 0.45;
+    ctx.fillStyle = canBuy ? '#6a1b9a' : '#444444';
+    roundRect(BUY_BTN.x, BUY_BTN.y, BUY_BTN.w, BUY_BTN.h, 8); ctx.fill();
+    ctx.strokeStyle = '#ce93d8'; ctx.lineWidth = 1.5;
+    roundRect(BUY_BTN.x, BUY_BTN.y, BUY_BTN.w, BUY_BTN.h, 8); ctx.stroke();
+    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('🟣 密造単位購入', BUY_BTN.x + BUY_BTN.w / 2, BUY_BTN.y + 13);
+    ctx.fillStyle = '#e1bee7'; ctx.font = '10px sans-serif';
+    ctx.fillText('¥200 → 1単位（危険）', BUY_BTN.x + BUY_BTN.w / 2, BUY_BTN.y + 27);
+    ctx.globalAlpha = 1;
+
+    // ── 検閲エフェクトオーバーレイ ──────
+    if (censorFlash > 0) {
+        const fadeAlpha = Math.min(1, censorFlash / 0.4) * 0.80;
+        ctx.globalAlpha = fadeAlpha;
+        ctx.fillStyle = '#880000';
+        ctx.fillRect(0, 0, W, H);
+        // スキャンライン
+        ctx.fillStyle = 'rgba(0,0,0,0.22)';
+        for (let sy = 0; sy < H; sy += 4) { ctx.fillRect(0, sy, W, 2); }
+        const textAlpha = Math.min(1, censorFlash * 1.1);
+        ctx.globalAlpha = textAlpha;
+        ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 18;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 34px serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('⚠ 当局による検閲 ⚠', W / 2, H / 2 - 22);
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#ffff44';
+        ctx.font = 'bold 19px sans-serif';
+        ctx.fillText('密造単位は全て没収されました', W / 2, H / 2 + 18);
+        ctx.globalAlpha = 1;
+    }
 }
 
 /* ================================================================
@@ -906,6 +1010,29 @@ function handleClick(x, y) {
         if (x >= W / 2 - 110 && x <= W / 2 + 110 && y >= 280 && y <= 332) {
             initGame();
             gameState = STATE.PLAYING;
+        }
+    } else if (gameState === STATE.PLAYING) {
+        // 売却ボタン（1単位 → ¥1,000）
+        if (x >= SELL_BTN.x && x <= SELL_BTN.x + SELL_BTN.w &&
+            y >= SELL_BTN.y && y <= SELL_BTN.y + SELL_BTN.h) {
+            if (credits >= 1) {
+                credits -= 1;
+                money   += 1000;
+                spawnCollect(SELL_BTN.x + SELL_BTN.w / 2, SELL_BTN.y + 10, '#81c784', '+¥1,000');
+            }
+        }
+        // 密造単位購入ボタン（¥200 → 1密造単位）
+        if (x >= BUY_BTN.x && x <= BUY_BTN.x + BUY_BTN.w &&
+            y >= BUY_BTN.y && y <= BUY_BTN.y + BUY_BTN.h) {
+            if (money >= 200) {
+                money   -= 200;
+                credits += 1;
+                spawnCollect(BUY_BTN.x + BUY_BTN.w / 2, BUY_BTN.y + 10, '#ce93d8', '+1単位(密)');
+                // 検閲判定（25%）
+                if (Math.random() < 0.25) {
+                    spawnCensor();
+                }
+            }
         }
     } else if (gameState === STATE.ENDING) {
         const RBy = H - 108;
