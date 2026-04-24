@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>単位ゲット大作戦！ - 緋色製作所</title>
+    <meta name="description" content="黒い怪物を避けながら単位を集めるミニゲーム。ログイン不要でブラウザだけで遊べます。">
+    <meta name="keywords" content="ミニゲーム,単位,ブラウザゲーム,HTML5,Canvas">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="単位ゲット大作戦！ - 緋色製作所">
+    <meta property="og:description" content="黒い怪物を避けながら単位を集めるブラウザミニゲーム">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://shushushu-san.github.io/work0004.html">
+    <link rel="canonical" href="https://shushushu-san.github.io/work0004.html">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        #game-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        #gameCanvas {
+            border: 3px solid #2c3e50;
+            border-radius: 10px;
+            display: block;
+            max-width: 100%;
+            cursor: crosshair;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        /* ===== モバイル Dパッド ===== */
+        #dpad {
+            display: none;
+            grid-template-columns: repeat(3, 54px);
+            grid-template-rows: repeat(3, 54px);
+            gap: 5px;
+            user-select: none;
+        }
+
+        @media (max-width: 800px), (pointer: coarse) {
+            #dpad { display: grid; }
+        }
+
+        .dpad-btn {
+            width: 54px;
+            height: 54px;
+            background: #2c3e50;
+            color: #ecf0f1;
+            border: none;
+            border-radius: 10px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: none;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.1s, transform 0.1s;
+        }
+
+        .dpad-btn:active,
+        .dpad-btn.pressed {
+            background: #dc3545;
+            transform: scale(0.90);
+        }
+
+        .dpad-center {
+            background: #455a6a;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        #game-info {
+            max-width: 720px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">緋色製作所</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">ホーム</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="works.html">作品一覧</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="blog.html">開発日記</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <div class="container mt-5 py-5">
+        <!-- パンくずリスト -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">ホーム</a></li>
+                <li class="breadcrumb-item"><a href="works.html">作品紹介</a></li>
+                <li class="breadcrumb-item active" aria-current="page">単位ゲット大作戦！</li>
+            </ol>
+        </nav>
+
+        <div id="game-wrapper">
+            <!-- ゲームキャンバス -->
+            <canvas id="gameCanvas" width="720" height="450"></canvas>
+
+            <!-- スマホ用 Dパッド -->
+            <div id="dpad" aria-label="方向ボタン">
+                <div></div>
+                <button class="dpad-btn" id="btn-up"   aria-label="上">▲</button>
+                <div></div>
+                <button class="dpad-btn" id="btn-left"  aria-label="左">◀</button>
+                <div class="dpad-btn dpad-center"></div>
+                <button class="dpad-btn" id="btn-right" aria-label="右">▶</button>
+                <div></div>
+                <button class="dpad-btn" id="btn-down"  aria-label="下">▼</button>
+                <div></div>
+            </div>
+        </div>
+
+        <!-- 遊び方 -->
+        <div id="game-info" class="mx-auto mt-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">遊び方</h5>
+                    <ul class="mb-0">
+                        <li><strong>PC</strong>: 矢印キー または <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> でプレイヤーを動かす</li>
+                        <li><strong>スマホ</strong>: 画面下の方向ボタンで操作</li>
+                        <li>光っている単位アイテムに触れると単位を取得できる</li>
+                        <li>黒い怪物に当たると残機が減る（当たった直後は一時的に無敵）</li>
+                        <li>60秒でできるだけ多くの単位を集めよう！</li>
+                        <li>最終スコアによってエンディングが 5 種類変化する</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="fixed-bottom bg-body-tertiary text-center py-3">
+    <small>© 2024 緋色製作所</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+<script>
+'use strict';
+
+/* ================================================================
+   キャンバス
+   ================================================================ */
+const canvas = document.getElementById('gameCanvas');
+const ctx    = canvas.getContext('2d');
+const W = canvas.width;   // 720
+const H = canvas.height;  // 450
+
+/* ================================================================
+   ゲーム状態
+   ================================================================ */
+const STATE = Object.freeze({ TITLE: 0, PLAYING: 1, ENDING: 2 });
+let gameState = STATE.TITLE;
+
+/* ================================================================
+   プレイヤー
+   ================================================================ */
+const player = {
+    x:         W / 2,
+    y:         H / 2,
+    radius:    18,
+    speed:     210,      // px/s
+    lives:     3,
+    invincible: 0        // 秒（無敵時間カウントダウン）
+};
+
+/* ================================================================
+   ゲーム変数
+   ================================================================ */
+let credits          = 0;
+let timeLeft         = 60;
+let enemies          = [];
+let items            = [];
+let particles        = [];
+let bgStars          = [];
+let itemSpawnTimer   = 0;
+let enemySpawnTimer  = 0;
+
+/* ================================================================
+   キーボード入力
+   ================================================================ */
+const keys = {};
+
+document.addEventListener('keydown', e => {
+    keys[e.key] = true;
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) {
+        e.preventDefault();
+    }
+});
+document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+/* ================================================================
+   Dパッド（スマホ）
+   ================================================================ */
+function setupDPad() {
+    const map = { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' };
+    ['up', 'down', 'left', 'right'].forEach(dir => {
+        const btn = document.getElementById('btn-' + dir);
+        if (!btn) return;
+
+        const press = () => { keys[map[dir]] = true;  btn.classList.add('pressed'); };
+        const release = () => { keys[map[dir]] = false; btn.classList.remove('pressed'); };
+
+        btn.addEventListener('touchstart', e => { e.preventDefault(); press(); },   { passive: false });
+        btn.addEventListener('touchend',   e => { e.preventDefault(); release(); }, { passive: false });
+        btn.addEventListener('touchcancel',e => { e.preventDefault(); release(); }, { passive: false });
+        btn.addEventListener('mousedown',  () => press());
+        btn.addEventListener('mouseup',    () => release());
+        btn.addEventListener('mouseleave', () => release());
+    });
+}
+
+/* ================================================================
+   アイテム定義
+   ================================================================ */
+const ITEM_TYPES = [
+    { value: 1, color: '#3498db', label: '1単位', radius: 16, prob: 0.45 },
+    { value: 2, color: '#27ae60', label: '2単位', radius: 20, prob: 0.30 },
+    { value: 4, color: '#e67e22', label: '4単位', radius: 25, prob: 0.18 },
+    { value: 8, color: '#9b59b6', label: '8単位', radius: 30, prob: 0.07 },
+];
+
+function pickItemType() {
+    let r = Math.random();
+    for (const t of ITEM_TYPES) { r -= t.prob; if (r <= 0) return t; }
+    return ITEM_TYPES[0];
+}
+
+function spawnItem() {
+    const mg = 65, top = 55;
+    const t = pickItemType();
+    items.push({
+        x: mg + Math.random() * (W - mg * 2),
+        y: top + Math.random() * (H - top - mg),
+        value:  t.value,
+        color:  t.color,
+        label:  t.label,
+        radius: t.radius,
+        life:   6.0,
+        maxLife: 6.0,
+        pulse:  Math.random() * Math.PI * 2
+    });
+}
+
+/* ================================================================
+   敵生成
+   ================================================================ */
+function spawnEnemy() {
+    const side = Math.floor(Math.random() * 4);
+    const r    = 18 + Math.random() * 12;
+    let x, y;
+    switch (side) {
+        case 0: x = Math.random() * W;  y = -r - 5;      break; // 上
+        case 1: x = W + r + 5;          y = Math.random() * H; break; // 右
+        case 2: x = Math.random() * W;  y = H + r + 5;   break; // 下
+        default: x = -r - 5;            y = Math.random() * H; break; // 左
+    }
+
+    // 画面中央付近を狙って進入
+    const tx   = W / 2 + (Math.random() - 0.5) * W * 0.5;
+    const ty   = H / 2 + (Math.random() - 0.5) * H * 0.4;
+    const dist = Math.hypot(tx - x, ty - y);
+    const spd  = 75 + Math.random() * 55;
+
+    enemies.push({
+        x, y,
+        vx: (tx - x) / dist * spd,
+        vy: (ty - y) / dist * spd,
+        radius: r,
+        wobble: Math.random() * Math.PI * 2
+    });
+}
+
+/* ================================================================
+   パーティクル
+   ================================================================ */
+function spawnCollect(x, y, color, text) {
+    for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        particles.push({
+            x, y,
+            vx: Math.cos(a) * (55 + Math.random() * 75),
+            vy: Math.sin(a) * (55 + Math.random() * 75),
+            life: 0.55, maxLife: 0.55,
+            radius: 3 + Math.random() * 3,
+            color, text: null
+        });
+    }
+    particles.push({ x, y: y - 8, vx: 0, vy: -55,
+                     life: 1.1, maxLife: 1.1, radius: 0, color, text });
+}
+
+function spawnDamage(x, y) {
+    for (let i = 0; i < 16; i++) {
+        const a = Math.random() * Math.PI * 2;
+        particles.push({
+            x, y,
+            vx: Math.cos(a) * (80 + Math.random() * 110),
+            vy: Math.sin(a) * (80 + Math.random() * 110),
+            life: 0.7, maxLife: 0.7,
+            radius: 4 + Math.random() * 4,
+            color: '#e74c3c', text: null
+        });
+    }
+    particles.push({ x, y: y - 15, vx: 0, vy: -40,
+                     life: 1.0, maxLife: 1.0, radius: 0, color: '#ff6b6b', text: 'いたい！' });
+}
+
+/* ================================================================
+   背景星（タイトル・エンディング用）
+   ================================================================ */
+function initBgStars() {
+    bgStars = [];
+    for (let i = 0; i < 90; i++) {
+        bgStars.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            r: 0.5 + Math.random() * 1.8,
+            speed: 12 + Math.random() * 36,   // px/s
+            alpha: 0.3 + Math.random() * 0.6
+        });
+    }
+}
+
+function updateBgStars(dt) {
+    for (const s of bgStars) {
+        s.y += s.speed * dt;
+        if (s.y > H) { s.y = 0; s.x = Math.random() * W; }
+    }
+}
+
+/* ================================================================
+   ゲーム初期化
+   ================================================================ */
+function initGame() {
+    credits         = 0;
+    timeLeft        = 60;
+    player.x        = W / 2;
+    player.y        = H / 2;
+    player.lives    = 3;
+    player.invincible = 0;
+    enemies         = [];
+    items           = [];
+    particles       = [];
+    itemSpawnTimer  = 0;
+    enemySpawnTimer = 0;
+
+    for (let i = 0; i < 3; i++) spawnEnemy();
+    for (let i = 0; i < 4; i++) spawnItem();
+}
+
+/* ================================================================
+   エンディング定義
+   ================================================================ */
+function getEnding() {
+    if (credits >= 124) return {
+        rank: 'S', rankColor: '#ffd700',
+        title: '完全卒業！優等生！',
+        subtitle: '124単位以上を取得！最高の結果です！',
+        lines: ['4年間の努力が実を結びました。', '輝かしい未来へ羽ばたこう！'],
+        bg: '#05100a', panelBorder: '#ffd700'
+    };
+    if (credits >= 80) return {
+        rank: 'A', rankColor: '#2ecc71',
+        title: 'ご卒業おめでとう！',
+        subtitle: '必要単位を取得して卒業しました',
+        lines: ['社会人としての新しい章が始まります。', '頑張ってください！'],
+        bg: '#021208', panelBorder: '#2ecc71'
+    };
+    if (credits >= 50) return {
+        rank: 'B', rankColor: '#f39c12',
+        title: 'ギリギリ卒業...',
+        subtitle: 'なんとか単位を揃えました',
+        lines: ['ギリギリですが卒業できました。', '今後はもう少し余裕を持って単位を取ろう。'],
+        bg: '#120b00', panelBorder: '#f39c12'
+    };
+    if (credits >= 30) return {
+        rank: 'C', rankColor: '#e74c3c',
+        title: '留年確定...',
+        subtitle: '単位が足りませんでした',
+        lines: [`取得単位: ${credits}単位（あと${50 - credits}単位不足）`,
+                '来年また頑張りましょう。留年料の準備を...'],
+        bg: '#120000', panelBorder: '#e74c3c'
+    };
+    return {
+        rank: 'D', rankColor: '#9b59b6',
+        title: '退学処分...',
+        subtitle: '単位が壊滅的に足りません',
+        lines: [`取得単位: ${credits}単位`,
+                '単位を大切にしましょう。新しい道を探してみては？'],
+        bg: '#0a0010', panelBorder: '#9b59b6'
+    };
+}
+
+/* ================================================================
+   描画ユーティリティ
+   ================================================================ */
+// ctx.roundRect が古いブラウザで動かない場合のフォールバック
+function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y,     x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h,     x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y,         x + r, y);
+    ctx.closePath();
+}
+
+/* ================================================================
+   UPDATE
+   ================================================================ */
+function update(dt) {
+    if (gameState !== STATE.PLAYING) return;
+
+    // タイマー
+    timeLeft -= dt;
+    if (timeLeft <= 0) {
+        timeLeft  = 0;
+        gameState = STATE.ENDING;
+        return;
+    }
+
+    // ── プレイヤー移動 ──────────────────────
+    let dx = 0, dy = 0;
+    if (keys['ArrowLeft']  || keys['a'] || keys['A']) dx -= 1;
+    if (keys['ArrowRight'] || keys['d'] || keys['D']) dx += 1;
+    if (keys['ArrowUp']    || keys['w'] || keys['W']) dy -= 1;
+    if (keys['ArrowDown']  || keys['s'] || keys['S']) dy += 1;
+    if (dx !== 0 && dy !== 0) { dx *= 0.707; dy *= 0.707; }
+
+    const TOP_BOUND = 50; // HUD分の余白
+    player.x = Math.max(player.radius,
+               Math.min(W - player.radius,     player.x + dx * player.speed * dt));
+    player.y = Math.max(player.radius + TOP_BOUND,
+               Math.min(H - player.radius,     player.y + dy * player.speed * dt));
+
+    if (player.invincible > 0) player.invincible -= dt;
+
+    // ── アイテム ──────────────────────────
+    itemSpawnTimer -= dt;
+    if (itemSpawnTimer <= 0) {
+        if (items.length < 8) spawnItem();
+        itemSpawnTimer = 1.8;
+    }
+
+    for (let i = items.length - 1; i >= 0; i--) {
+        const it = items[i];
+        it.life  -= dt;
+        it.pulse += dt * 3.5;
+        if (it.life <= 0) { items.splice(i, 1); continue; }
+
+        const d = Math.hypot(player.x - it.x, player.y - it.y);
+        if (d < player.radius + it.radius) {
+            credits += it.value;
+            spawnCollect(it.x, it.y, it.color, '+' + it.value + '単位');
+            items.splice(i, 1);
+        }
+    }
+
+    // ── 敵 ───────────────────────────────
+    enemySpawnTimer -= dt;
+    if (enemySpawnTimer <= 0) {
+        const elapsed    = 60 - timeLeft;
+        const maxEnemies = 3 + Math.floor(elapsed / 12);
+        if (enemies.length < maxEnemies) spawnEnemy();
+        enemySpawnTimer = Math.max(1.4, 4.0 - elapsed * 0.05);
+    }
+
+    for (const e of enemies) {
+        e.wobble += dt * 2;
+        e.x += e.vx * dt;
+        e.y += e.vy * dt;
+
+        // 壁で反射
+        if (e.x - e.radius < 0 || e.x + e.radius > W) {
+            e.vx *= -1;
+            e.x = Math.max(e.radius, Math.min(W - e.radius, e.x));
+        }
+        if (e.y - e.radius < 0 || e.y + e.radius > H) {
+            e.vy *= -1;
+            e.y = Math.max(e.radius, Math.min(H - e.radius, e.y));
+        }
+
+        // プレイヤー追跡（緩やか）
+        const ex   = player.x - e.x;
+        const ey   = player.y - e.y;
+        const edst = Math.hypot(ex, ey);
+        if (edst > 0) {
+            const track = 18 * dt;
+            e.vx += (ex / edst) * track;
+            e.vy += (ey / edst) * track;
+            const spd = Math.hypot(e.vx, e.vy);
+            if (spd > 130) { e.vx = e.vx / spd * 130; e.vy = e.vy / spd * 130; }
+        }
+
+        // 当たり判定
+        if (player.invincible <= 0) {
+            const d = Math.hypot(player.x - e.x, player.y - e.y);
+            if (d < player.radius + e.radius - 5) {
+                player.lives--;
+                player.invincible = 2.0;
+                spawnDamage(player.x, player.y);
+                if (player.lives <= 0) { gameState = STATE.ENDING; return; }
+            }
+        }
+    }
+
+    // ── パーティクル ─────────────────────
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x  += p.vx * dt;
+        p.y  += p.vy * dt;
+        if (p.text) p.vy += 20 * dt; // テキストはちょっと落下
+        p.life -= dt;
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+}
+
+/* ================================================================
+   DRAW: タイトル画面
+   ================================================================ */
+function drawTitle(t) {
+    ctx.fillStyle = '#0d0d1a';
+    ctx.fillRect(0, 0, W, H);
+
+    // 星
+    for (const s of bgStars) {
+        ctx.globalAlpha = s.alpha;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // 背景に浮かぶ単位アイテム（デコ）
+    const deco = [
+        { x: 70,  y: 110, c: '#3498db', lbl: '2単位' },
+        { x: 640, y: 180, c: '#27ae60', lbl: '4単位' },
+        { x: 140, y: 340, c: '#e67e22', lbl: '1単位' },
+        { x: 590, y: 370, c: '#9b59b6', lbl: '8単位' },
+    ];
+    for (const d of deco) {
+        const by = d.y + Math.sin(t * 1.4 + d.x * 0.012) * 10;
+        ctx.globalAlpha = 0.3;
+        ctx.fillStyle = d.c;
+        ctx.beginPath(); ctx.arc(d.x, by, 22, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 0.55;
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(d.lbl, d.x, by);
+        ctx.globalAlpha = 1;
+    }
+
+    // タイトル文字
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = 'bold 46px serif';
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillText('単位ゲット大作戦！', W / 2 + 2, 132);
+
+    const grad = ctx.createLinearGradient(0, 108, 0, 160);
+    grad.addColorStop(0, '#ffd700'); grad.addColorStop(1, '#ff8c00');
+    ctx.fillStyle = grad;
+    ctx.fillText('単位ゲット大作戦！', W / 2, 130);
+
+    ctx.fillStyle = '#cccccc';
+    ctx.font = '17px sans-serif';
+    ctx.fillText('黒い怪物を避けながら単位を集めよう！', W / 2, 182);
+    ctx.fillText('60秒でどれだけ単位を取れるかな？', W / 2, 208);
+
+    ctx.fillStyle = '#999999';
+    ctx.font = '13px sans-serif';
+    ctx.fillText('PC: 矢印キー / WASD　　スマホ: 画面下のボタン', W / 2, 250);
+
+    // スタートボタン
+    const SBTN = { x: W / 2 - 110, y: 280, w: 220, h: 52 };
+    const pulse = (Math.sin(t * 3.0) + 1) / 2;
+    ctx.shadowColor = '#dc3545'; ctx.shadowBlur = 10 + pulse * 14;
+    ctx.fillStyle = `rgb(${Math.floor(175 + pulse * 45)}, 50, 65)`;
+    roundRect(SBTN.x, SBTN.y, SBTN.w, SBTN.h, 12); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 22px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('ゲームスタート', W / 2, SBTN.y + SBTN.h / 2);
+
+    // アイテム一覧
+    ctx.fillStyle = 'rgba(255,255,255,0.07)';
+    roundRect(W / 2 - 210, 358, 420, 62, 8); ctx.fill();
+    ctx.fillStyle = '#aaaaaa'; ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('アイテム一覧', W / 2, 374);
+
+    const legend = [
+        { c: '#3498db', lbl: '1単位', x: W / 2 - 145 },
+        { c: '#27ae60', lbl: '2単位', x: W / 2 - 48  },
+        { c: '#e67e22', lbl: '4単位', x: W / 2 + 50  },
+        { c: '#9b59b6', lbl: '8単位', x: W / 2 + 148 },
+    ];
+    for (const li of legend) {
+        ctx.fillStyle = li.c;
+        ctx.beginPath(); ctx.arc(li.x, 395, 10, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#cccccc'; ctx.font = '11px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(li.lbl, li.x, 413);
+    }
+}
+
+/* ================================================================
+   DRAW: ゲームプレイ
+   ================================================================ */
+function drawGame() {
+    // ノート用紙風背景
+    ctx.fillStyle = '#fafaf0';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = 'rgba(90, 150, 210, 0.22)';
+    ctx.lineWidth = 1;
+    for (let y = 30; y < H; y += 30) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(210, 90, 90, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(52, 0); ctx.lineTo(52, H); ctx.stroke();
+
+    // ── アイテム ──────────────────────
+    for (const it of items) {
+        const alpha = it.life < 1.5 ? it.life / 1.5 : 1.0;
+        const glow  = Math.sin(it.pulse) * 4;
+
+        ctx.globalAlpha = alpha * 0.35;
+        ctx.fillStyle = it.color;
+        ctx.beginPath(); ctx.arc(it.x, it.y, it.radius + 9 + glow, 0, Math.PI * 2); ctx.fill();
+
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = it.color;
+        ctx.beginPath(); ctx.arc(it.x, it.y, it.radius + glow * 0.25, 0, Math.PI * 2); ctx.fill();
+
+        // ハイライト
+        ctx.fillStyle = 'rgba(255,255,255,0.38)';
+        ctx.beginPath(); ctx.arc(it.x - it.radius * 0.28, it.y - it.radius * 0.28,
+                                  it.radius * 0.32, 0, Math.PI * 2); ctx.fill();
+
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${Math.floor(it.radius * 0.74)}px sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(it.label, it.x, it.y);
+        ctx.globalAlpha = 1;
+    }
+
+    // ── 敵 ───────────────────────────
+    for (const e of enemies) {
+        // 影
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        ctx.beginPath();
+        ctx.ellipse(e.x + 3, e.y + 7, e.radius * 0.88, e.radius * 0.44, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        const wob = Math.sin(e.wobble);
+        ctx.save();
+        ctx.translate(e.x, e.y);
+        ctx.scale(1 + wob * 0.04, 1 - wob * 0.04);
+
+        // 本体
+        ctx.fillStyle = '#111111';
+        ctx.beginPath(); ctx.arc(0, 0, e.radius, 0, Math.PI * 2); ctx.fill();
+
+        // 内部テクスチャ
+        ctx.fillStyle = '#1c1c1c';
+        ctx.beginPath(); ctx.arc(-e.radius * 0.18, -e.radius * 0.18,
+                                   e.radius * 0.46, 0, Math.PI * 2); ctx.fill();
+
+        // 目（赤）
+        ctx.fillStyle = '#ff3333';
+        ctx.beginPath();
+        ctx.arc(-e.radius * 0.28, -e.radius * 0.14, e.radius * 0.18, 0, Math.PI * 2);
+        ctx.arc( e.radius * 0.28, -e.radius * 0.14, e.radius * 0.18, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 瞳（黄）
+        ctx.fillStyle = '#ffee00';
+        ctx.beginPath();
+        ctx.arc(-e.radius * 0.28, -e.radius * 0.14, e.radius * 0.09, 0, Math.PI * 2);
+        ctx.arc( e.radius * 0.28, -e.radius * 0.14, e.radius * 0.09, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    // ── プレイヤー ───────────────────
+    const blinkAlpha = player.invincible > 0
+        ? (Math.sin(player.invincible * 25) > 0 ? 1.0 : 0.15) : 1.0;
+    ctx.globalAlpha = blinkAlpha;
+
+    // 影
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.beginPath();
+    ctx.ellipse(player.x + 2, player.y + player.radius - 2,
+                player.radius * 0.84, player.radius * 0.36, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 体
+    ctx.fillStyle = '#e74c3c';
+    ctx.beginPath(); ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2); ctx.fill();
+
+    // 目（白）
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(player.x - 6, player.y - 4, 5, 0, Math.PI * 2);
+    ctx.arc(player.x + 6, player.y - 4, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#222222';
+    ctx.beginPath();
+    ctx.arc(player.x - 6, player.y - 4, 2.4, 0, Math.PI * 2);
+    ctx.arc(player.x + 6, player.y - 4, 2.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 笑顔
+    ctx.strokeStyle = '#222222'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(player.x, player.y + 1, 6, 0.22, Math.PI - 0.22);
+    ctx.stroke();
+
+    // 角帽（graduation cap）
+    const capCY = player.y - player.radius - 4;
+    ctx.fillStyle = '#2c3e50';
+    ctx.fillRect(player.x - 13, capCY - 4, 26, 5);   // ツバ
+    ctx.beginPath();                                    // 頂上
+    ctx.moveTo(player.x - 11, capCY - 4);
+    ctx.lineTo(player.x,       capCY - 13);
+    ctx.lineTo(player.x + 11, capCY - 4);
+    ctx.closePath(); ctx.fill();
+    // タッセル
+    ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(player.x + 9, capCY - 9); ctx.lineTo(player.x + 14, capCY + 2); ctx.stroke();
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath(); ctx.arc(player.x + 14, capCY + 4, 2.5, 0, Math.PI * 2); ctx.fill();
+
+    ctx.globalAlpha = 1;
+
+    // ── パーティクル ─────────────────
+    for (const p of particles) {
+        ctx.globalAlpha = p.life / p.maxLife;
+        if (p.text) {
+            ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 3;
+            ctx.font = 'bold 15px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.strokeText(p.text, p.x, p.y);
+            ctx.fillStyle = p.color;
+            ctx.fillText(p.text, p.x, p.y);
+        } else {
+            ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.radius * (p.life / p.maxLife), 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+    }
+
+    // ══════ HUD ══════════════════════
+    // 上部バー
+    ctx.fillStyle = 'rgba(30, 40, 55, 0.88)';
+    roundRect(0, 0, W, 47, 0); ctx.fill();
+
+    // 取得単位
+    ctx.fillStyle = '#ffd700'; ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText('取得単位:', 12, 23);
+    ctx.font = 'bold 22px sans-serif';
+    ctx.fillText(String(credits), 90, 23);
+    ctx.fillStyle = '#bbbbbb'; ctx.font = '13px sans-serif';
+    ctx.fillText('単位', 90 + ctx.measureText(String(credits)).width + 3, 23);
+
+    // 残機
+    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('残機', W / 2, 13);
+    for (let i = 0; i < 3; i++) {
+        ctx.fillStyle = i < player.lives ? '#e74c3c' : 'rgba(255,255,255,0.18)';
+        ctx.beginPath(); ctx.arc(W / 2 - 22 + i * 22, 31, 7, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // タイマー
+    const timerFlash = timeLeft < 15 && (Date.now() % 800 < 400);
+    ctx.fillStyle = timerFlash ? '#ff4040' : '#ffffff';
+    ctx.font = `bold ${timeLeft < 15 ? 26 : 22}px sans-serif`;
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(Math.ceil(timeLeft) + '秒', W - 12, 22);
+    ctx.fillStyle = '#aaaaaa'; ctx.font = '11px sans-serif';
+    ctx.fillText('残り時間', W - 12, 38);
+}
+
+/* ================================================================
+   DRAW: エンディング画面
+   ================================================================ */
+function drawEnding(t) {
+    const e = getEnding();
+
+    ctx.fillStyle = e.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // 星
+    for (const s of bgStars) {
+        ctx.globalAlpha = s.alpha * 0.55;
+        ctx.fillStyle = e.rankColor;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // パネル
+    ctx.fillStyle = 'rgba(0,0,0,0.65)';
+    roundRect(55, 35, W - 110, H - 70, 16); ctx.fill();
+    ctx.strokeStyle = e.panelBorder; ctx.lineWidth = 2;
+    roundRect(55, 35, W - 110, H - 70, 16); ctx.stroke();
+
+    // ランクバッジ
+    ctx.font = 'bold 78px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = e.rankColor; ctx.shadowBlur = 22;
+    ctx.fillStyle = e.rankColor;
+    ctx.fillText(e.rank, W / 2, 115);
+    ctx.shadowBlur = 0;
+
+    ctx.font = '12px sans-serif'; ctx.fillStyle = e.rankColor;
+    ctx.fillText('ランク', W / 2, 160);
+
+    // タイトル
+    ctx.font = 'bold 30px serif'; ctx.fillStyle = '#ffffff';
+    ctx.fillText(e.title, W / 2, 200);
+
+    // サブタイトル
+    ctx.font = '16px sans-serif'; ctx.fillStyle = e.rankColor;
+    ctx.fillText(e.subtitle, W / 2, 232);
+
+    // スコア
+    ctx.font = 'bold 20px sans-serif'; ctx.fillStyle = '#ffffff';
+    ctx.fillText('取得単位: ' + credits + '単位', W / 2, 266);
+
+    // メッセージ
+    ctx.font = '15px sans-serif'; ctx.fillStyle = '#cccccc';
+    e.lines.forEach((line, i) => ctx.fillText(line, W / 2, 298 + i * 25));
+
+    // もう一度ボタン
+    const RB = { x: W / 2 - 100, y: H - 108, w: 200, h: 48 };
+    const pulse = (Math.sin(t * 2.5) + 1) / 2;
+    ctx.shadowColor = '#dc3545'; ctx.shadowBlur = 8 + pulse * 10;
+    ctx.fillStyle = '#c0392b';
+    roundRect(RB.x, RB.y, RB.w, RB.h, 10); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 19px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('もう一度遊ぶ', W / 2, RB.y + RB.h / 2);
+
+    // タイトルへボタン
+    const TB = { x: W / 2 - 80, y: RB.y + RB.h + 9, w: 160, h: 34 };
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    roundRect(TB.x, TB.y, TB.w, TB.h, 8); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.28)'; ctx.lineWidth = 1;
+    roundRect(TB.x, TB.y, TB.w, TB.h, 8); ctx.stroke();
+    ctx.fillStyle = '#aaaaaa'; ctx.font = '14px sans-serif';
+    ctx.fillText('タイトルへ戻る', W / 2, TB.y + TB.h / 2);
+}
+
+/* ================================================================
+   クリック / タッチ ハンドラ
+   ================================================================ */
+function getCanvasXY(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+        x: (clientX - rect.left) * (W / rect.width),
+        y: (clientY - rect.top)  * (H / rect.height)
+    };
+}
+
+function handleClick(x, y) {
+    if (gameState === STATE.TITLE) {
+        // スタートボタン y=280 ~ 332
+        if (x >= W / 2 - 110 && x <= W / 2 + 110 && y >= 280 && y <= 332) {
+            initGame();
+            gameState = STATE.PLAYING;
+        }
+    } else if (gameState === STATE.ENDING) {
+        const RBy = H - 108;
+        // もう一度ボタン
+        if (x >= W / 2 - 100 && x <= W / 2 + 100 && y >= RBy && y <= RBy + 48) {
+            initGame();
+            gameState = STATE.PLAYING;
+        }
+        // タイトルへ
+        const TBy = RBy + 48 + 9;
+        if (x >= W / 2 - 80 && x <= W / 2 + 80 && y >= TBy && y <= TBy + 34) {
+            gameState = STATE.TITLE;
+        }
+    }
+}
+
+canvas.addEventListener('click', e => {
+    const p = getCanvasXY(e.clientX, e.clientY);
+    handleClick(p.x, p.y);
+});
+canvas.addEventListener('touchend', e => {
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    const p = getCanvasXY(t.clientX, t.clientY);
+    handleClick(p.x, p.y);
+}, { passive: false });
+
+/* ================================================================
+   ゲームループ
+   ================================================================ */
+let lastTS = 0;
+
+function gameLoop(ts) {
+    const dt = Math.min((ts - lastTS) / 1000, 0.05); // 最大 50ms に制限
+    lastTS = ts;
+    const t = ts / 1000;
+
+    if (gameState === STATE.TITLE || gameState === STATE.ENDING) {
+        updateBgStars(dt);
+    }
+    update(dt);
+
+    ctx.clearRect(0, 0, W, H);
+    if      (gameState === STATE.TITLE)   drawTitle(t);
+    else if (gameState === STATE.PLAYING) drawGame();
+    else if (gameState === STATE.ENDING)  drawEnding(t);
+
+    requestAnimationFrame(gameLoop);
+}
+
+/* ================================================================
+   起動
+   ================================================================ */
+initBgStars();
+setupDPad();
+requestAnimationFrame(ts => { lastTS = ts; requestAnimationFrame(gameLoop); });
+</script>
+</body>
+</html>
