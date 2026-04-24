@@ -147,7 +147,7 @@
                         <li><strong>スマホ</strong>: 画面下の方向ボタンで操作</li>
                         <li>光っている単位アイテムに触れると単位を取得できる</li>
                         <li>黒い怪物に当たると<strong>敵の大きさに応じて単位を落とす</strong>（残機は減らない）</li>
-                        <li>✊ たまに<strong>「大学当局に抗議する」バナー</strong>が流れてくる。取ると／ 50%成功・50%弾圧（残機-1）。／ 3回成功で残機全回復・+40単位・検閲と弾圧が無効化！／ 3回弾圧されると逮捕 Game Over！</li>
+                        <li>✊ たまに<strong>「大学当局に抗議する」バナー</strong>が流れてくる。取ると／ 40%成功・60%弾圧（残機-1）。／ 3回成功で残機全回復・+40単位・検閲と弾圧が無効化！／ 3回弾圧されると逮捕 Game Over！</li>
                         <li>💰 <strong>バイト</strong>（右下）: 1単位 を落とすが ¥1,000 GET</li>
                         <li>🟣 <strong>密造単位購入</strong>（右下）: ¥200 → 1単位　　※3%の確率で検閲・全単位没収。<strong>3回検閲で逮捕 Game Over！</strong></li>
                         <li>90秒でできるだけ多くの単位を集めよう！</li>
@@ -472,7 +472,7 @@ function spawnProtestItem() {
 }
 
 function resolveProtest(x, y) {
-    if (Math.random() < 0.50) {
+    if (Math.random() < 0.40) {
         protestSuccessCount++;
         spawnProtestSuccess(x, y);
         if (protestSuccessCount >= 3) {
@@ -553,7 +553,7 @@ function getEnding() {
         rank: 'S', rankColor: '#ffd700',
         title: '完全卒業！おめでとう！',
         subtitle: '124単位以上を取得！最高の結果です！',
-        lines: ['研究第一！研究第一！', '低い給料でも研究室に残るタイプの優等生ですね。', 'きっと大学からも大切にされるでしょう。'],
+        lines: ['研究第一！低い給料でも研究室に残るタイプの優等生ですね。', 'きっと大学からも大切にされるでしょう。'],
         bg: '#05100a', panelBorder: '#ffd700'
     };
     if (credits >= 80) return {
@@ -863,7 +863,7 @@ function drawGame() {
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             ctx.fillText('✊ 大学当局に抗議する ✊', it.x, it.y - 6);
             ctx.fillStyle = '#a5d6a7'; ctx.font = '10px sans-serif';
-            ctx.fillText('成功50% / 弾圧50%', it.x, it.y + 11);
+            ctx.fillText('成功40% / 弾圧60%', it.x, it.y + 11);
             ctx.globalAlpha = 1;
             continue;
         }
