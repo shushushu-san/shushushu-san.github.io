@@ -147,9 +147,9 @@
                         <li><strong>スマホ</strong>: 画面下の方向ボタンで操作</li>
                         <li>光っている単位アイテムに触れると単位を取得できる</li>
                         <li>黒い怪物に当たると<strong>敵の大きさに応じて単位を落とす</strong>（残機は減らない）</li>
-                        <li>✊ たまに<strong>「大学当局に抗議する」バナー</strong>が流れてくる。取ると／ 38%成功・62%弾圧（残機-1）。／ 3回成功で残機全回復・+40単位・検閲と弾圧が無効化！／ 3回弾圧されると逮捕 Game Over！</li>
+                        <li>✊ たまに<strong>「大学当局に抗議する」バナー</strong>が流れてくる。取ると／ 50%成功・50%弾圧（残機-1）。／ 3回成功で残機全回復・+40単位・検閲と弾圧が無効化！／ 3回弾圧されると逮捕 Game Over！</li>
                         <li>💰 <strong>バイト</strong>（右下）: 1単位 を落とすが ¥1,000 GET</li>
-                        <li>🟣 <strong>密造単位購入</strong>（右下）: ¥200 → 1単位　　※10%の確率で検閲・全単位没収。<strong>3回検閲で逮捕 Game Over！</strong></li>
+                        <li>🟣 <strong>密造単位購入</strong>（右下）: ¥200 → 1単位　　※3%の確率で検閲・全単位没収。<strong>3回検閲で逮捕 Game Over！</strong></li>
                         <li>90秒でできるだけ多くの単位を集めよう！</li>
                         <li>最終スコアによってエンディングが 5 種類変化する</li>
                     </ul>
@@ -472,7 +472,7 @@ function spawnProtestItem() {
 }
 
 function resolveProtest(x, y) {
-    if (Math.random() < 0.38) {
+    if (Math.random() < 0.50) {
         protestSuccessCount++;
         spawnProtestSuccess(x, y);
         if (protestSuccessCount >= 3) {
@@ -1310,8 +1310,8 @@ function handleClick(x, y) {
                 money   -= 200;
                 credits += 1;
                 spawnCollect(BUY_BTN.x + BUY_BTN.w / 2, BUY_BTN.y + 10, '#ce93d8', '+1単位(密)');
-                // 検閲判定（10%）
-                if (Math.random() < 0.10) {
+                // 検閲判定（3%）
+                if (Math.random() < 0.03) {
                     spawnCensor();
                 }
             }
