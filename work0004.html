@@ -147,7 +147,7 @@
                         <li><strong>スマホ</strong>: 画面下の方向ボタンで操作</li>
                         <li>光っている単位アイテムに触れると単位を取得できる</li>
                         <li>黒い怪物に当たると<strong>敵の大きさに応じて単位を落とす</strong>（残機は減らない）</li>
-                        <li>✊ たまに<strong>「大学当局に抗議する」バナー</strong>が流れてくる。取ると／ 25%成功・75%弾圧（残機-1）。／ 3回成功で残機全回復・+40単位・検閲と弾圧が無効化！／ 3回弾圧されると逮捕 Game Over！</li>
+                        <li>✊ たまに<strong>「大学当局に抗議する」バナー</strong>が流れてくる。取ると／ 38%成功・62%弾圧（残機-1）。／ 3回成功で残機全回復・+40単位・検閲と弾圧が無効化！／ 3回弾圧されると逮捕 Game Over！</li>
                         <li>💰 <strong>バイト</strong>（右下）: 1単位 を落とすが ¥1,000 GET</li>
                         <li>🟣 <strong>密造単位購入</strong>（右下）: ¥200 → 1単位　　※10%の確率で検閲・全単位没収。<strong>3回検閲で逮捕 Game Over！</strong></li>
                         <li>90秒でできるだけ多くの単位を集めよう！</li>
@@ -472,7 +472,7 @@ function spawnProtestItem() {
 }
 
 function resolveProtest(x, y) {
-    if (Math.random() < 0.25) {
+    if (Math.random() < 0.38) {
         protestSuccessCount++;
         spawnProtestSuccess(x, y);
         if (protestSuccessCount >= 3) {
