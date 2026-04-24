@@ -147,6 +147,7 @@
                         <li><strong>スマホ</strong>: 画面下の方向ボタンで操作</li>
                         <li>光っている単位アイテムに触れると単位を取得できる</li>
                         <li>黒い怪物に当たると<strong>敵の大きさに応じて単位を落とす</strong>（残機は減らない）</li>
+                        <li>✊ たまに<strong>「大学当局に抗議する」バナー</strong>が流れてくる。取ると／ 65%成功・35%弾圧（残機-1）。／ 3回成功で残機全回復・+40単位・検閲と弾圧が無効化！／ 3回弾圧されると逮捕 Game Over！</li>
                         <li>💰 <strong>バイト</strong>（右下）: 1単位 を落とすが ¥1,000 GET</li>
                         <li>🟣 <strong>密造単位購入</strong>（右下）: ¥200 → 1単位　　※25%の確率で検閲・全単位没収。<strong>3回検閲で逮捕 Game Over！</strong></li>
                         <li>60秒でできるだけ多くの単位を集めよう！</li>
@@ -214,6 +215,12 @@ let enemySpawnTimer  = 0;
 let censorFlash        = 0;     // 検閲エフェクトタイマー（秒）
 let censorCount        = 0;     // 検閲された回数
 let censorArrestTimer  = 0;     // 3回目検閲後の逮捕遷移タイマー
+let protestSuccessCount = 0;    // 抗議成功回数
+let protestFailCount    = 0;    // 弾圧（抗議失敗）回数
+let repressionFlash     = 0;    // 弾圧エフェクトタイマー（秒）
+let protestSpawnTimer   = 12;   // 抗議バナー出現タイマー（秒）
+let resistanceNerfed    = false;// 抗議3回成功後フラグ
+let arrestReason        = 'censor'; // 逮捕理由: 'censor' | 'protest'
 
 /* ================================================================
    キーボード入力
@@ -355,6 +362,7 @@ function spawnDamage(x, y, lostUnits) {
    検閲エフェクト
    ================================================================ */
 function spawnCensor() {
+    if (resistanceNerfed) return;
     const lost = credits;
     credits = 0;
     censorCount++;
@@ -377,7 +385,110 @@ function spawnCensor() {
                          color: '#ffcc00', text: lost + '単位 没収！' });
     }
     if (censorCount >= 3) {
-        censorArrestTimer = 2.4; // エフェクト後に逮捕画面へ
+        arrestReason = 'censor';
+        censorArrestTimer = 2.4;
+    }
+}
+
+/* ================================================================
+   弾圧・抗議エフェクト
+   ================================================================ */
+function spawnRepression() {
+    repressionFlash = 1.8;
+    for (let i = 0; i < 22; i++) {
+        const a = Math.random() * Math.PI * 2;
+        particles.push({
+            x: W / 2 + (Math.random() - 0.5) * 240,
+            y: H / 2 + (Math.random() - 0.5) * 160,
+            vx: Math.cos(a) * (70 + Math.random() * 110),
+            vy: Math.sin(a) * (70 + Math.random() * 110),
+            life: 1.1, maxLife: 1.1,
+            radius: 4 + Math.random() * 7, color: '#1a237e', text: null
+        });
+    }
+    particles.push({ x: W / 2, y: H / 2 - 20, vx: 0, vy: -22,
+                     life: 2.0, maxLife: 2.0, radius: 0, color: '#ff5722', text: '🚓 弾圧！残機-1' });
+    if (protestFailCount >= 3) {
+        particles.push({ x: W / 2, y: H / 2 + 20, vx: 0, vy: -10,
+                         life: 2.0, maxLife: 2.0, radius: 0, color: '#ffeb3b', text: '逮捕手続き中...' });
+    }
+}
+
+function spawnProtestSuccess(x, y) {
+    for (let i = 0; i < 14; i++) {
+        const a = (i / 14) * Math.PI * 2;
+        particles.push({
+            x, y,
+            vx: Math.cos(a) * (60 + Math.random() * 90),
+            vy: Math.sin(a) * (60 + Math.random() * 90),
+            life: 0.7, maxLife: 0.7,
+            radius: 3 + Math.random() * 4, color: '#66bb6a', text: null
+        });
+    }
+    particles.push({ x, y: y - 10, vx: 0, vy: -50,
+                     life: 1.5, maxLife: 1.5, radius: 0, color: '#76ff03', text: '✊ 抗議成功！' });
+}
+
+function spawnResistanceVictory() {
+    const cols = ['#4caf50', '#ffeb3b', '#f44336', '#2196f3', '#e040fb'];
+    for (let i = 0; i < 40; i++) {
+        const a = Math.random() * Math.PI * 2;
+        particles.push({
+            x: W / 2 + (Math.random() - 0.5) * 380,
+            y: H / 2 + (Math.random() - 0.5) * 260,
+            vx: Math.cos(a) * (80 + Math.random() * 160),
+            vy: Math.sin(a) * (80 + Math.random() * 160),
+            life: 2.0, maxLife: 2.0,
+            radius: 4 + Math.random() * 9,
+            color: cols[Math.floor(Math.random() * cols.length)], text: null
+        });
+    }
+    particles.push({ x: W / 2, y: H / 2 - 35, vx: 0, vy: -14,
+                     life: 3.5, maxLife: 3.5, radius: 0, color: '#76ff03',
+                     text: '✊ 抵抗運動 勝利！ +40単位' });
+    particles.push({ x: W / 2, y: H / 2 + 18, vx: 0, vy: -6,
+                     life: 3.5, maxLife: 3.5, radius: 0, color: '#ffeb3b',
+                     text: '残機全回復！検閲・弾圧を無効化！' });
+}
+
+function spawnProtestItem() {
+    if (resistanceNerfed) return;
+    const goRight = Math.random() < 0.5;
+    const y = 70 + Math.random() * (H - 150);
+    const spd = 78 + Math.random() * 38;
+    items.push({
+        x: goRight ? -65 : W + 65,
+        y,
+        vx: goRight ? spd : -spd,
+        vy: 0,
+        value: 0,
+        color: '#2e7d32',
+        label: '✊大学当局に抗議する',
+        radius: 45,
+        life: 14.0, maxLife: 14.0,
+        pulse: 0,
+        isProtest: true
+    });
+}
+
+function resolveProtest(x, y) {
+    if (Math.random() < 0.65) {
+        protestSuccessCount++;
+        spawnProtestSuccess(x, y);
+        if (protestSuccessCount >= 3) {
+            player.lives = 3;
+            credits += 40;
+            resistanceNerfed = true;
+            spawnResistanceVictory();
+        }
+    } else {
+        protestFailCount++;
+        player.lives = Math.max(0, player.lives - 1);
+        spawnRepression();
+        if (protestFailCount >= 3) {
+            arrestReason = 'protest';
+            censorArrestTimer = 2.0;
+        }
     }
 }
 
@@ -423,6 +534,12 @@ function initGame() {
     censorFlash        = 0;
     censorCount        = 0;
     censorArrestTimer  = 0;
+    protestSuccessCount = 0;
+    protestFailCount    = 0;
+    repressionFlash     = 0;
+    protestSpawnTimer   = 12;
+    resistanceNerfed    = false;
+    arrestReason        = 'censor';
 
     for (let i = 0; i < 3; i++) spawnEnemy();
     for (let i = 0; i < 4; i++) spawnItem();
@@ -519,6 +636,7 @@ function update(dt) {
 
     if (player.invincible > 0) player.invincible -= dt;
     if (censorFlash > 0) censorFlash -= dt;
+    if (repressionFlash > 0) repressionFlash -= dt;
     if (censorArrestTimer > 0) {
         censorArrestTimer -= dt;
         if (censorArrestTimer <= 0) { gameState = STATE.ARRESTED; return; }
@@ -527,15 +645,32 @@ function update(dt) {
     // ── アイテム ──────────────────────────
     itemSpawnTimer -= dt;
     if (itemSpawnTimer <= 0) {
-        if (items.length < 8) spawnItem();
+        if (items.filter(it => !it.isProtest).length < 8) spawnItem();
         itemSpawnTimer = 1.8;
+    }
+
+    protestSpawnTimer -= dt;
+    if (protestSpawnTimer <= 0 && !resistanceNerfed) {
+        spawnProtestItem();
+        protestSpawnTimer = 15 + Math.random() * 8;
     }
 
     for (let i = items.length - 1; i >= 0; i--) {
         const it = items[i];
         it.life  -= dt;
         it.pulse += dt * 3.5;
-        if (it.life <= 0) { items.splice(i, 1); continue; }
+        if (it.vx) it.x += it.vx * dt;
+        if (it.life <= 0 || it.x < -120 || it.x > W + 120) { items.splice(i, 1); continue; }
+
+        if (it.isProtest) {
+            const bw = 110, bh = 20;
+            if (Math.abs(player.x - it.x) < bw + player.radius &&
+                Math.abs(player.y - it.y) < bh + player.radius) {
+                resolveProtest(it.x, it.y);
+                items.splice(i, 1);
+            }
+            continue;
+        }
 
         const d = Math.hypot(player.x - it.x, player.y - it.y);
         if (d < player.radius + it.radius) {
@@ -862,19 +997,37 @@ function drawGame() {
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     ctx.fillText('¥' + money.toLocaleString() + '円', 12, 34);
 
-    // 検閲カウンター（中央）
-    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('検閲回数', W / 2, 12);
+    // ── HUD 中央：検閲・抗議・弾圧・残機インジケーター ──
+    const HUD_CX     = [248, 340, 428, 516];
+    const HUD_LABELS = ['検閲', '抗議✊', '弾圧', '残機'];
+    const HUD_COLORS = ['#ff8a80', '#a5d6a7', '#90caf9', '#e74c3c'];
+    ctx.font = 'bold 9px sans-serif'; ctx.textBaseline = 'middle';
+    for (let g = 0; g < 4; g++) {
+        ctx.fillStyle = HUD_COLORS[g]; ctx.textAlign = 'center';
+        ctx.fillText(HUD_LABELS[g], HUD_CX[g], 10);
+    }
+    // 検閲ドット
     for (let i = 0; i < 3; i++) {
-        const triggered = i < censorCount;
-        ctx.fillStyle = triggered ? '#cc0000' : 'rgba(255,255,255,0.18)';
-        ctx.beginPath(); ctx.arc(W / 2 - 22 + i * 22, 31, 8, 0, Math.PI * 2); ctx.fill();
-        if (triggered) {
-            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px sans-serif';
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText('⚠', W / 2 - 22 + i * 22, 31);
-        }
+        ctx.fillStyle = i < censorCount ? '#cc0000' : 'rgba(255,255,255,0.15)';
+        ctx.beginPath(); ctx.arc(HUD_CX[0] - 16 + i * 16, 30, 6, 0, Math.PI * 2); ctx.fill();
+        if (i < censorCount) { ctx.fillStyle = '#fff'; ctx.font = '8px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('⚠', HUD_CX[0] - 16 + i * 16, 30); }
+    }
+    // 抗議成功ドット
+    for (let i = 0; i < 3; i++) {
+        ctx.fillStyle = i < protestSuccessCount ? (resistanceNerfed ? '#76ff03' : '#4caf50') : 'rgba(255,255,255,0.15)';
+        ctx.beginPath(); ctx.arc(HUD_CX[1] - 16 + i * 16, 30, 6, 0, Math.PI * 2); ctx.fill();
+        if (i < protestSuccessCount) { ctx.fillStyle = '#fff'; ctx.font = '8px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('✊', HUD_CX[1] - 16 + i * 16, 30); }
+    }
+    // 弾圧ドット
+    for (let i = 0; i < 3; i++) {
+        ctx.fillStyle = i < protestFailCount ? '#1565c0' : 'rgba(255,255,255,0.15)';
+        ctx.beginPath(); ctx.arc(HUD_CX[2] - 16 + i * 16, 30, 6, 0, Math.PI * 2); ctx.fill();
+        if (i < protestFailCount) { ctx.fillStyle = '#fff'; ctx.font = '8px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('×', HUD_CX[2] - 16 + i * 16, 30); }
+    }
+    // 残機ハート
+    for (let i = 0; i < 3; i++) {
+        ctx.fillStyle = i < player.lives ? '#e74c3c' : 'rgba(255,255,255,0.15)';
+        ctx.beginPath(); ctx.arc(HUD_CX[3] - 16 + i * 16, 30, 6, 0, Math.PI * 2); ctx.fill();
     }
 
     // タイマー
@@ -897,7 +1050,7 @@ function drawGame() {
     roundRect(SELL_BTN.x, SELL_BTN.y, SELL_BTN.w, SELL_BTN.h, 8); ctx.stroke();
     ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('💰 単位を売る', SELL_BTN.x + SELL_BTN.w / 2, SELL_BTN.y + 13);
+    ctx.fillText('💰 バイト', SELL_BTN.x + SELL_BTN.w / 2, SELL_BTN.y + 13);
     ctx.fillStyle = '#a5d6a7'; ctx.font = '10px sans-serif';
     ctx.fillText('1単位 → ¥1,000', SELL_BTN.x + SELL_BTN.w / 2, SELL_BTN.y + 27);
     ctx.globalAlpha = 1;
@@ -936,6 +1089,28 @@ function drawGame() {
         ctx.fillStyle = '#ffff44';
         ctx.font = 'bold 19px sans-serif';
         ctx.fillText(censorCount >= 3 ? '逮捕手続き中...' : '密造単位は全て没収されました', W / 2, H / 2 + 18);
+        ctx.globalAlpha = 1;
+    }
+
+    // ── 弾圧エフェクトオーバーレイ ──────
+    if (repressionFlash > 0) {
+        const fadeAlpha2 = Math.min(1, repressionFlash / 0.4) * 0.75;
+        ctx.globalAlpha = fadeAlpha2;
+        ctx.fillStyle = '#0d1b6e';
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = 'rgba(0,0,0,0.25)';
+        for (let sy = 0; sy < H; sy += 4) { ctx.fillRect(0, sy, W, 2); }
+        const textAlpha2 = Math.min(1, repressionFlash * 1.2);
+        ctx.globalAlpha = textAlpha2;
+        ctx.shadowColor = '#2196f3'; ctx.shadowBlur = 16;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 32px serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('🚓 弾圧された！ 🚓', W / 2, H / 2 - 22);
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#ffeb3b';
+        ctx.font = 'bold 17px sans-serif';
+        ctx.fillText(protestFailCount >= 3 ? '逮捕手続き中...' : '抗議活動が镇圧されました', W / 2, H / 2 + 18);
         ctx.globalAlpha = 1;
     }
 }
@@ -1058,16 +1233,24 @@ function drawArrested(t) {
     ctx.shadowBlur = 0;
 
     ctx.fillStyle = '#ff9999'; ctx.font = '16px sans-serif';
-    ctx.fillText('単位の密造・不法取引の疑いにより拘束されました', W / 2, 158);
+    ctx.fillText(arrestReason === 'protest'
+        ? '不法な抗議活動・暴力的抵抗の疑いにより拘束されました'
+        : '単位の密造・不法取引の疑いにより拘束されました', W / 2, 158);
 
     ctx.font = '40px sans-serif';
-    ctx.fillText('🚔', W / 2, 208);
+    ctx.fillText(arrestReason === 'protest' ? '🚓' : '🚔', W / 2, 208);
 
     ctx.fillStyle = '#ffdddd'; ctx.font = 'bold 14px sans-serif';
-    ctx.fillText('検閲回数: 3/3 回　　違法取引: 確定', W / 2, 252);
+    ctx.fillText(arrestReason === 'protest'
+        ? '弾圧回数: 3/3 回　　危険人物: 認定'
+        : '検閲回数: 3/3 回　　違法取引: 確定', W / 2, 252);
     ctx.fillStyle = '#aaaaaa'; ctx.font = '14px sans-serif';
-    ctx.fillText('密造単位に手を出したのが間違いでした。', W / 2, 278);
-    ctx.fillText('真面目に授業に出ましょう。', W / 2, 302);
+    ctx.fillText(arrestReason === 'protest'
+        ? '当局への抗抵は無意味です。'
+        : '密造単位に手を出したのが間違いでした。', W / 2, 278);
+    ctx.fillText(arrestReason === 'protest'
+        ? '大人しく単位を取りましょう。'
+        : '真面目に授業に出ましょう。', W / 2, 302);
 
     // やり直すボタン
     const RB = { x: W / 2 - 108, y: H - 108, w: 216, h: 46 };
