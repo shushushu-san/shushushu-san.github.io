@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ハッカーの歴史 - 緋色製作所 | フリーキングからサイバー戦争までの年表</title>
+
+    <!-- SEO meta tags -->
+    <meta name="description" content="ハッカーの歴史をまとめた記事。1960年代のMITやフリーキングから、モリスワーム、ケビン・ミトニック、Anonymous、Stuxnet、ランサムウェアまで、ハッカー文化とサイバーセキュリティの歩みを年表で紹介します。">
+    <meta name="keywords" content="ハッカー,歴史,年表,フリーキング,モリスワーム,ケビン・ミトニック,Anonymous,Stuxnet,ランサムウェア,サイバーセキュリティ,ハッカー文化">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph tags -->
+    <meta property="og:title" content="ハッカーの歴史 - 緋色製作所">
+    <meta property="og:description" content="フリーキングからサイバー戦争まで、ハッカーの歴史を年表でまとめました。">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://shushushu-san.github.io/blog0001.html">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://shushushu-san.github.io/blog0001.html">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="timeline.css">
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">緋色製作所</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">ホーム</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="works.html">作品紹介</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="blog.html">開発日記</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<main>
+    <div class="container mt-5 py-5">
+        <!-- パンくずリスト -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">ホーム</a></li>
+                <li class="breadcrumb-item"><a href="blog.html">開発日記</a></li>
+                <li class="breadcrumb-item active" aria-current="page">ハッカーの歴史</li>
+            </ol>
+        </nav>
+
+        <!-- 記事ヘッダー -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="p-4 rounded bg-body-secondary">
+                    <h1 class="display-5 mb-3">
+                        <i class="fas fa-user-secret text-danger me-3"></i>
+                        ハッカーの歴史
+                    </h1>
+                    <p class="lead mb-4">フリーキングからサイバー戦争まで、ハッカー文化とセキュリティの歩みを年表でまとめていきます。</p>
+                    <div class="project-badges tech-stack">
+                        <span class="badge tech-software">ハッカー文化</span>
+                        <span class="badge tech-design">セキュリティ</span>
+                        <span class="badge tech-3d">年表</span>
+                    </div>
+                    <p class="text-muted mb-0 mt-3"><small><i class="fas fa-calendar-alt me-1"></i> 2025/09/29 更新 ・ 随時追記予定</small></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- はじめに -->
+                <section class="mb-5">
+                    <h2 class="mb-4"><i class="fas fa-book-open text-primary me-2"></i>はじめに</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text">
+                                「ハッカー」という言葉は、今でこそ不正アクセスや犯罪と結び付けて語られることが多いですが、
+                                その起源は技術を深く理解し、システムを創意工夫でとことん使いこなそうとする探究者たちの文化にあります。
+                            </p>
+                            <p class="card-text">
+                                この記事では、1960年代のフリーキングやハッカー文化の黎明期から、
+                                ワームやマルウェアの登場、大規模なインシデント、そして国家が関与するサイバー攻撃までを、
+                                時系列で少しずつまとめていきます。まずは全体像を <strong>年表</strong> で俯瞰してみましょう。
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 年表 -->
+                <section class="mb-5">
+                    <h2 class="mb-4"><i class="fas fa-timeline text-primary me-2"></i>ハッカー史 年表</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text mb-3">
+                                カテゴリごとに水平線で並べています。丸いマーカーは単年の出来事、帯（バー）は複数年にわたる動きを表します。
+                                マーカーやバーにカーソルを合わせる（タップする）と詳細が表示されます。
+                            </p>
+                            <!-- 年表描画先 -->
+                            <div id="hacker-timeline"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 黎明期 -->
+                <section class="mb-5">
+                    <h2 class="mb-4"><i class="fas fa-phone-volume text-secondary me-2"></i>黎明期とフリーキング（1960s–1970s）</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text">
+                                「ハッカー」という語は、1960年代前半のマサチューセッツ工科大学（MIT）の
+                                鉄道模型クラブ（TMRC）周辺で、システムを巧みに操る行為を指す肯定的な言葉として使われ始めたと言われています。
+                            </p>
+                            <p class="card-text">
+                                同じ頃、電話網を音（トーン）で操作する「フリーキング（phreaking）」が生まれました。
+                                ジョン・ドレイパー（通称 Captain Crunch）は、シリアルの景品の笛が出す 2600Hz の音で
+                                長距離通話を無料にできることを見つけ、「ブルーボックス」と呼ばれる装置が広まりました。
+                                後に Apple を創業するスティーブ・ウォズニアックとスティーブ・ジョブズも、
+                                このブルーボックスを製作・販売していたことで知られています。
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 文化と集団 -->
+                <section class="mb-5">
+                    <h2 class="mb-4"><i class="fas fa-users text-secondary me-2"></i>ハッカー文化と集団の形成（1980s–1990s）</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text">
+                                1980年代に入ると、パーソナルコンピュータの普及とともにハッカーたちがコミュニティを形成していきます。
+                                ドイツでは 1981 年に Chaos Computer Club（CCC）が設立され、
+                                アメリカでは雑誌『2600: The Hacker Quarterly』（1984年創刊）や
+                                Legion of Doom といったグループが登場しました。
+                            </p>
+                            <p class="card-text">
+                                1986 年には The Mentor による「ハッカー宣言（The Hacker Manifesto）」が発表され、
+                                ハッカー精神を象徴する文章として広く読まれました。
+                                一方でこの時期、映画『ウォー・ゲーム』（1983年）の影響もあって社会の警戒感が高まり、
+                                アメリカではコンピュータ不正行為防止法（CFAA, 1986年）が成立します。
+                            </p>
+                            <p class="card-text">
+                                1990 年には電子フロンティア財団（EFF）が設立され、
+                                1993 年からはハッカーの祭典 DEF CON が開催されるようになりました。
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ワームとマルウェア -->
+                <section class="mb-5">
+                    <h2 class="mb-4"><i class="fas fa-bug text-secondary me-2"></i>ワームとマルウェアの時代</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text">
+                                1988 年、モリスワームがインターネットに接続された多数のコンピュータへ拡散し、
+                                「インターネットワーム」の脅威を世界に知らしめました。
+                                その後、Melissa（1999年）や ILOVEYOU（2000年）といったメール経由のマルウェアが大流行し、
+                                SQL Slammer（2003年）や Conficker（2008年）のように高速に拡散するワームも登場します。
+                            </p>
+                            <p class="card-text">
+                                やがてマルウェアは愉快犯的なものから、金銭や政治目的のものへと変質していきます。
+                                2010 年に発見された Stuxnet は、イランの核関連施設の産業制御システムを標的にした
+                                極めて高度なマルウェアで、国家が関与するサイバー攻撃の時代の幕開けを象徴しました。
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 現代 -->
+                <section class="mb-5">
+                    <h2 class="mb-4"><i class="fas fa-globe text-secondary me-2"></i>ハクティビズムと国家間サイバー攻撃（2010s–）</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text">
+                                2000 年代後半から、政治的な主張を目的とする「ハクティビズム」が台頭します。
+                                匿名の集団 Anonymous や、そこから派生した LulzSec（2011年）が
+                                企業や政府機関への攻撃を繰り返し、大きな注目を集めました。
+                            </p>
+                            <p class="card-text">
+                                2013 年にはエドワード・スノーデンが NSA による大規模監視を暴露し、
+                                プライバシーと国家監視をめぐる議論を巻き起こしました。
+                                以降、Sony Pictures へのハック（2014年）、WannaCry ランサムウェア（2017年）、
+                                SolarWinds サプライチェーン攻撃（2020年）、Colonial Pipeline へのランサムウェア攻撃（2021年）など、
+                                社会インフラを揺るがす大規模インシデントが相次いでいます。
+                            </p>
+                            <p class="card-text text-muted">
+                                ※ この記事は随時追記していく予定です。年表のデータも今後増やしていきます。
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- サイドバー -->
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fas fa-list me-2"></i>目次</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><a href="#" class="text-decoration-none">はじめに</a></li>
+                            <li class="mb-2"><a href="#" class="text-decoration-none">ハッカー史 年表</a></li>
+                            <li class="mb-2"><a href="#" class="text-decoration-none">黎明期とフリーキング</a></li>
+                            <li class="mb-2"><a href="#" class="text-decoration-none">文化と集団の形成</a></li>
+                            <li class="mb-2"><a href="#" class="text-decoration-none">ワームとマルウェアの時代</a></li>
+                            <li class="mb-2"><a href="#" class="text-decoration-none">ハクティビズムと国家間攻撃</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fas fa-info-circle me-2"></i>この記事について</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">カテゴリ:</dt>
+                            <dd class="col-sm-8">技術ブログ</dd>
+                            <dt class="col-sm-4">状態:</dt>
+                            <dd class="col-sm-8">随時更新</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fas fa-share-alt me-2"></i>Contact</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="https://twitter.com/shushushu_san" target="_blank" rel="noopener noreferrer" class="btn-social btn-twitter btn-sm">
+                                <i class="fab fa-twitter"></i> Twitter
+                            </a>
+                            <a href="https://github.com/shushushu-san" target="_blank" rel="noopener noreferrer" class="btn-social btn-github btn-sm">
+                                <i class="fab fa-github"></i> GitHub
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 記事一覧へ戻る -->
+        <div class="row my-5">
+            <div class="col-12">
+                <a href="blog.html" class="btn btn-outline-danger">
+                    <i class="fas fa-arrow-left me-2"></i>開発日記の一覧へ戻る
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+<footer class="py-3 fixed-bottom bg-body-tertiary">
+    <div class="text-center">
+        <span class="text-body-secondary">© 緋色製作所 HiiroTech</span>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script src="timeline.js"></script>
+<script>
+    // ハッカー史 年表データ（随時追記していく）
+    // start: 開始年, end: 終了年（省略で単年）, category: 行, summary: ツールチップ本文
+    var HACKER_EVENTS = [
+        // --- 黎明期・フリーキング ---
+        { category: '黎明期・フリーキング', title: '「ハック」の語が広まる', start: 1961, summary: 'MITの鉄道模型クラブ(TMRC)周辺で、システムを巧みに操る行為を指す言葉として使われ始めた。' },
+        { category: '黎明期・フリーキング', title: 'Captain Crunch のブルーボックス', start: 1971, summary: 'ジョン・ドレイパーが2600Hzの音で長距離通話を無料化できることを発見。フリーキングが広まる。' },
+        { category: '黎明期・フリーキング', title: 'ウォズニアックらがブルーボックス販売', start: 1972, summary: '後にAppleを創業するウォズニアックとジョブズがブルーボックスを製作・販売していた。' },
+        { category: '黎明期・フリーキング', title: 'フリーキング全盛期', start: 1970, end: 1983, summary: '電話網をトーンで操作するフリーキング文化が広く行われた時期。' },
+
+        // --- ハッカー文化・集団 ---
+        { category: 'ハッカー文化・集団', title: 'Chaos Computer Club 設立', start: 1981, summary: 'ドイツで設立されたヨーロッパ最大級のハッカー団体。' },
+        { category: 'ハッカー文化・集団', title: '414s の事件', start: 1982, summary: '10代の若者グループ 414s が病院や研究所のシステムに侵入し社会問題化。' },
+        { category: 'ハッカー文化・集団', title: '『2600』創刊 / Legion of Doom', start: 1984, summary: 'ハッカー雑誌『2600: The Hacker Quarterly』が創刊。ハッカーグループ Legion of Doom も登場。' },
+        { category: 'ハッカー文化・集団', title: 'ハッカー宣言', start: 1986, summary: 'The Mentor による「The Hacker Manifesto」が発表され、ハッカー精神の象徴として広まった。' },
+        { category: 'ハッカー文化・集団', title: 'EFF 設立', start: 1990, summary: '電子フロンティア財団が設立され、デジタル時代の市民権擁護を掲げた。' },
+        { category: 'ハッカー文化・集団', title: 'DEF CON 初開催', start: 1993, summary: '世界最大級のハッカーカンファレンス DEF CON がラスベガスで初開催。' },
+        { category: 'ハッカー文化・集団', title: 'Anonymous の発生', start: 2003, summary: '匿名掲示板4chan周辺から匿名集団Anonymousが生まれた。' },
+        { category: 'ハッカー文化・集団', title: 'LulzSec の活動', start: 2011, summary: 'Anonymousから派生した集団が企業・政府機関への攻撃を短期間に連続して行った。' },
+
+        // --- マルウェア・ワーム ---
+        { category: 'マルウェア・ワーム', title: '「コンピュータウイルス」の実証', start: 1983, summary: 'フレッド・コーエンが自己増殖するプログラムを実証し「computer virus」と命名。' },
+        { category: 'マルウェア・ワーム', title: 'モリスワーム', start: 1988, summary: '初の大規模インターネットワーム。多数のUNIXマシンに感染し大きな混乱を招いた。' },
+        { category: 'マルウェア・ワーム', title: 'Melissa', start: 1999, summary: 'Wordのマクロを利用しメール経由で急速に拡散したマクロウイルス。' },
+        { category: 'マルウェア・ワーム', title: 'ILOVEYOU', start: 2000, summary: '「Love Letter」を装ったメールで世界中に拡散し甚大な被害を与えた。' },
+        { category: 'マルウェア・ワーム', title: 'SQL Slammer', start: 2003, summary: 'わずか数分で世界中に拡散し、インターネットの一部を麻痺させた高速ワーム。' },
+        { category: 'マルウェア・ワーム', title: 'Conficker', start: 2008, summary: 'Windowsの脆弱性を突き数百万台規模のボットネットを形成したワーム。' },
+        { category: 'マルウェア・ワーム', title: 'Stuxnet', start: 2010, summary: 'イランの核関連施設の産業制御システムを標的にした高度なマルウェア。国家関与型攻撃の象徴。' },
+        { category: 'マルウェア・ワーム', title: 'Mirai ボットネット', start: 2016, summary: 'IoT機器を乗っ取り大規模なDDoS攻撃を引き起こしたボットネット。' },
+        { category: 'マルウェア・ワーム', title: 'WannaCry / NotPetya', start: 2017, summary: '世界規模で被害を出したランサムウェア。医療機関や企業のシステムを次々に暗号化した。' },
+
+        // --- 大規模インシデント・国家 ---
+        { category: '大規模事件・国家', title: 'カッコウはコンピュータに卵を産む', start: 1989, summary: 'クリフォード・ストールがKGB絡みの侵入者を追跡した事件。書籍としても有名。' },
+        { category: '大規模事件・国家', title: 'シティバンク不正送金事件', start: 1994, summary: 'ウラジミール・レビンがシティバンクのシステムに侵入し多額を不正送金。' },
+        { category: '大規模事件・国家', title: 'ケビン・ミトニック逮捕', start: 1995, summary: '当時最も有名なハッカーの一人が逮捕され、大きく報道された。' },
+        { category: '大規模事件・国家', title: 'スノーデンによるNSA暴露', start: 2013, summary: 'エドワード・スノーデンが国家による大規模監視の実態を暴露。' },
+        { category: '大規模事件・国家', title: 'Sony Pictures ハック', start: 2014, summary: '大量の内部情報が流出し、国家関与が指摘された大規模ハッキング事件。' },
+        { category: '大規模事件・国家', title: 'SolarWinds 攻撃', start: 2020, summary: 'ソフトウェア更新を悪用したサプライチェーン攻撃で多数の政府機関・企業が影響を受けた。' },
+        { category: '大規模事件・国家', title: 'Colonial Pipeline 攻撃', start: 2021, summary: '米国の石油パイプラインがランサムウェア攻撃で停止し、社会インフラへの脅威を示した。' },
+
+        // --- 法律・制度 ---
+        { category: '法律・制度', title: 'CFAA 成立', start: 1986, summary: '米国のコンピュータ不正行為防止法。ハッキングを違法とする代表的な法律。' },
+        { category: '法律・制度', title: 'Operation Sundevil', start: 1990, summary: '米国当局による大規模なハッカー摘発作戦。ハッカーコミュニティに衝撃を与えた。' }
+    ];
+
+    document.addEventListener('DOMContentLoaded', function () {
+        renderTimeline('#hacker-timeline', {
+            events: HACKER_EVENTS,
+            categories: [
+                '黎明期・フリーキング',
+                'ハッカー文化・集団',
+                'マルウェア・ワーム',
+                '大規模事件・国家',
+                '法律・制度'
+            ]
+        });
+    });
+</script>
+</body>
+</html>

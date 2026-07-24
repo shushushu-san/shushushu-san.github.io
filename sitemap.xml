@@ -28,6 +28,14 @@
         <priority>0.8</priority>
     </url>
     
+    <!-- ハッカーの歴史 記事 -->
+    <url>
+        <loc>https://shushushu-san.github.io/blog0001.html</loc>
+        <lastmod>2025-09-29</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
     <!-- パレスチナ連帯キーホルダープロジェクト -->
     <url>
         <loc>https://shushushu-san.github.io/work0001.html</loc>

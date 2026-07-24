@@ -1,0 +1,217 @@
+/* timeline.css - 年表（ガントチャート風）表示のスタイル */
+
+.tl-root {
+    --tl-color: #dc3545;
+    font-family: var(--primary-font, sans-serif);
+}
+
+/* 横スクロール領域 */
+.tl-scroller {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.5rem 0 1rem;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tl-chart {
+    position: relative;
+    min-width: 820px; /* 年数が多いので最低幅を確保して横スクロール */
+    padding-left: 130px; /* 行ラベル分の余白 */
+    box-sizing: border-box;
+}
+
+/* 年ラベルヘッダー */
+.tl-header {
+    position: relative;
+    height: 1.8rem;
+    margin-left: 0; /* chart 側で padding-left 済み */
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 0.75rem;
+}
+
+.tl-header__label {
+    position: absolute;
+    top: 0.2rem;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    color: #868e96;
+    font-family: var(--code-font, monospace);
+    white-space: nowrap;
+}
+
+/* 行 */
+.tl-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.tl-row__label {
+    position: absolute;
+    left: 0;
+    width: 118px;
+    padding-right: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #495057;
+    line-height: 1.3;
+    border-left: 3px solid var(--tl-color);
+    padding-left: 0.5rem;
+    box-sizing: border-box;
+}
+
+.tl-track {
+    position: relative;
+    flex: 1 1 auto;
+    height: 2.5rem;
+}
+
+.tl-track__line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    transform: translateY(-50%);
+    border-radius: 2px;
+}
+
+/* 単年イベント：円マーカー */
+.tl-marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    outline: none;
+}
+
+.tl-marker__ring {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--tl-color);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease;
+}
+
+.tl-marker__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--tl-color);
+    transition: opacity 0.15s ease;
+}
+
+.tl-marker:hover .tl-marker__ring,
+.tl-marker:focus .tl-marker__ring {
+    transform: scale(1.5);
+    background: var(--tl-color);
+}
+
+.tl-marker:hover .tl-marker__dot,
+.tl-marker:focus .tl-marker__dot {
+    opacity: 0;
+}
+
+/* 期間イベント：バー */
+.tl-bar {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    min-width: 8px;
+    cursor: pointer;
+    outline: none;
+}
+
+.tl-bar__body {
+    width: 100%;
+    height: 14px;
+    border-radius: 7px;
+    background: var(--tl-color);
+    opacity: 0.75;
+    transition: opacity 0.15s ease;
+}
+
+.tl-bar:hover .tl-bar__body,
+.tl-bar:focus .tl-bar__body {
+    opacity: 1;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--tl-color) 40%, transparent);
+}
+
+/* ツールチップ */
+.tl-tooltip {
+    position: absolute;
+    z-index: 50;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 0.5rem;
+    width: 15rem;
+    max-width: 60vw;
+    background: #212529;
+    color: #fff;
+    font-size: 0.78rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    padding: 0.6rem 0.7rem;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.12s ease;
+}
+
+.tl-tooltip--right {
+    left: auto;
+    right: 0;
+}
+
+.tl-marker:hover .tl-tooltip,
+.tl-marker:focus .tl-tooltip,
+.tl-bar:hover .tl-tooltip,
+.tl-bar:focus .tl-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tl-tooltip__title {
+    font-family: var(--primary-font, sans-serif);
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin: 0 0 0.25rem;
+    color: #fff;
+}
+
+.tl-tooltip__date {
+    margin: 0 0 0.35rem;
+    color: #ced4da;
+    font-family: var(--code-font, monospace);
+    font-size: 0.72rem;
+}
+
+.tl-tooltip__summary {
+    margin: 0;
+    color: #e9ecef;
+    line-height: 1.5;
+}
+
+/* スクロールヒント */
+.tl-hint {
+    font-size: 0.75rem;
+    color: #adb5bd;
+    text-align: right;
+    margin-top: 0.25rem;
+}
+
+.tl-empty {
+    text-align: center;
+    color: #adb5bd;
+    padding: 2rem 0;
+}
+
+@media (max-width: 576px) {
+    .tl-chart {
+        min-width: 640px;
+    }
+}
