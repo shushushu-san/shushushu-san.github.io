@@ -14,7 +14,6 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    padding-bottom: 60px; /* フッター用の余白 */
 }
 
 /* 見出し用フォント */
@@ -65,14 +64,6 @@ code, pre, kbd, samp {
 .bg-body-secondary {
     background-color: #f8f9fa !important;
     border: 1px solid #dee2e6;
-}
-
-/* フッターの位置調整 */
-
-.fixed-bottom {
-    height: 60px;
-    display: flex;
-    align-items: center;
 }
 
 /* リンクのスタイル */
@@ -137,57 +128,7 @@ article .card:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* 技術スタック用のバッジ */
-.tech-stack .badge {
-    background: linear-gradient(45deg, #6c757d, #495057) !important;
-    color: white;
-    font-weight: 500;
-    padding: 0.5em 0.75em;
-    border-radius: 0.375rem;
-    margin-right: 0.5rem;
-    margin-bottom: 0.5rem;
-    border: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: all 0.2s ease-in-out;
-}
-
-.tech-stack .badge:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-/* 技術カテゴリ別の色分け */
-.tech-stack .badge.tech-3d {
-    background: linear-gradient(45deg, #ff0000, #927777) !important;
-}
-
-.tech-stack .badge.tech-design {
-    background: linear-gradient(45deg, #ff0000, #927777) !important;
-}
-
-.tech-stack .badge.tech-software {
-    background: linear-gradient(45deg, #ff0000, #927777) !important;
-}
-
-.tech-stack .badge.tech-status {
-    background: linear-gradient(45deg, #ff0000, #927777) !important;
-    color: #000;
-}
-
-/* プロジェクトページのバッジコンテナ */
-.project-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.project-badges .badge {
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.375rem;
-}
+/* 技術スタック（タグ）は廃止しました */
 
 /* プロジェクトタイトルリンクのホバーエフェクト */
 .project-title-link {
@@ -365,4 +306,324 @@ article .card:hover {
 .btn-download.btn-sm {
     padding: 0.375rem 0.75rem;
     font-size: 0.875rem;
+}
+
+/* =========================================================
+   デザイン刷新オーバーライド（PC / スマホ両対応）
+   ========================================================= */
+:root {
+    --brand: #dc2626;
+    --brand-dark: #b91c1c;
+    --brand-darker: #991b1b;
+    --brand-soft: rgba(220, 38, 38, 0.08);
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --surface: #ffffff;
+    --surface-2: #f7f7f8;
+    --radius: 0.2rem;
+    --radius-sm: 0.1rem;
+    --shadow-sm: 0 1px 3px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.05);
+    --shadow-md: 0 6px 18px rgba(17, 24, 39, 0.08);
+    --shadow-lg: 0 14px 34px rgba(17, 24, 39, 0.12);
+    --nav-height: 3.5rem;
+}
+
+* { box-sizing: border-box; }
+
+/* シャープな見た目：Bootstrapの丸みを押さえる */
+.rounded,
+.rounded-1,
+.rounded-2,
+.rounded-3 {
+    border-radius: var(--radius) !important;
+}
+
+.btn,
+.form-control,
+.alert,
+.breadcrumb,
+.badge {
+    border-radius: var(--radius-sm) !important;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--nav-height) + 1rem);
+}
+
+/* スティッキーフッター＆固定ナビ回避 */
+body {
+    color: var(--ink);
+    background-color: var(--surface-2);
+    line-height: 1.75;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+main {
+    flex: 1 0 auto;
+    padding-top: var(--nav-height);
+}
+
+/* 見出し */
+h1, h2 { color: #6f3f3f; }
+h3, h4, h5, h6 { color: #7a4a4a; }
+.display-4, .display-5 { font-weight: 700; color: #6f3f3f; }
+
+a { color: var(--brand); }
+a:hover { color: var(--brand-dark); }
+
+.container { max-width: 1160px; }
+
+/* ---- ナビゲーション ---- */
+.navbar.fixed-top {
+    min-height: var(--nav-height);
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+}
+
+.navbar-brand {
+    font-family: var(--heading-font);
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: 0.03em;
+    color: var(--brand) !important;
+}
+
+.navbar .nav-link {
+    position: relative;
+    font-weight: 500;
+    color: #4b5563 !important;
+    padding-inline: 0.9rem !important;
+    transition: color 0.2s ease;
+}
+
+.navbar .nav-link:hover { color: var(--brand) !important; }
+.navbar .nav-link.active { color: var(--brand) !important; font-weight: 700; }
+
+@media (min-width: 992px) {
+    .navbar .nav-link.active::after {
+        content: "";
+        position: absolute;
+        left: 0.9rem;
+        right: 0.9rem;
+        bottom: 0.15rem;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--brand);
+    }
+}
+
+.navbar-toggler { border-color: var(--line); }
+.navbar-toggler:focus { box-shadow: 0 0 0 0.2rem var(--brand-soft); }
+
+/* ---- セクション（イントロ / ヒーロー / コンタクト）---- */
+.bg-body-secondary,
+.card.hero-section {
+    background: linear-gradient(135deg, #ffffff 0%, #fbf4f4 100%) !important;
+    border: 1px solid var(--line);
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow-sm);
+}
+
+.card.hero-section {
+    border-left: 4px solid var(--brand);
+    overflow: hidden;
+}
+
+.contact-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f7f7f8 100%) !important;
+    border: 1px solid var(--line);
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow-sm);
+}
+
+.lead { color: #4b5563; }
+
+/* ---- カード ---- */
+.card {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #fbfbfc;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--heading-font);
+}
+
+.card-title { color: #6f3f3f; }
+.card-text { color: #374151; }
+.card:hover { box-shadow: var(--shadow-md); }
+
+/* 操作可能なカードだけ持ち上げ */
+.blog-main article .card:hover,
+.card.h-250:hover,
+.row .col-md-6 > .card.h-100:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* 作品一覧カードを等高・ボタン下揃え */
+.card.h-250 {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card.h-250 .card-body { flex: 1 1 auto; }
+.card.h-250 .card-footer { margin-top: auto; }
+
+.card .card-body img.img-fluid {
+    width: 100%;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ---- ブログレイアウト ---- */
+@media (min-width: 992px) {
+    .blog-main { padding-right: 1rem; }
+    .blog-sidebar {
+        padding-left: 1rem;
+        position: sticky;
+        top: calc(var(--nav-height) + 1.5rem);
+        height: fit-content;
+    }
+}
+
+/* ---- ボタン（角丸・持ち上げを統一）---- */
+.btn-custom,
+.btn-custom-outline,
+.btn-social,
+.btn-download {
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+.btn-custom:hover,
+.btn-custom-outline:hover,
+.btn-social:hover,
+.btn-download:hover {
+    transform: translateY(-2px);
+}
+
+.btn-custom:focus-visible,
+.btn-custom-outline:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+/* イントロ内 BOOTH リンク（ボタン風に、indexの a.social-links のみ） */
+a.social-links {
+    display: inline-block;
+    margin-top: 1rem;
+    font-weight: 600;
+    padding: 0.5rem 1.15rem;
+    border: 2px solid var(--brand);
+    border-radius: var(--radius-sm);
+    transition: all 0.25s ease;
+}
+
+a.social-links:hover {
+    background: var(--brand);
+    color: #fff;
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+/* コンタクトのソーシャルリンク並び */
+.contact-section .social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* ---- パンくず ---- */
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    font-size: 0.9rem;
+}
+
+/* ---- アラート ---- */
+.alert-info {
+    background: linear-gradient(135deg, #fff 0%, #f2f7fb 100%);
+    border: 1px solid #dbeafe;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-info .alert-heading { color: #6f3f3f; }
+
+/* ---- フッター（スティッキー）---- */
+.site-footer {
+    flex-shrink: 0;
+    border-top: 1px solid var(--line);
+    background-color: #fbfbfc !important;
+}
+
+/* ---- レスポンシブ ---- */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        margin-top: 0.5rem;
+        padding: 0.5rem 0.25rem;
+        border-top: 1px solid var(--line);
+    }
+    .navbar .nav-link { padding-block: 0.4rem !important; }
+}
+
+@media (max-width: 768px) {
+    body { font-size: 15.5px; line-height: 1.7; }
+
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* 上下の余白を詰めて洗練 */
+    main .container.mt-5 { margin-top: 1rem !important; }
+    main .container.py-5 {
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
+
+    .display-4 { font-size: 2rem; }
+    .display-5 { font-size: 1.7rem; }
+    h2 { font-size: 1.4rem; }
+
+    .card.hero-section .card-body.p-5 { padding: 1.5rem !important; }
+    .p-4 { padding: 1.25rem !important; }
+
+    .btn-social,
+    .btn-custom,
+    .btn-custom-outline,
+    .btn-download {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .display-4 { font-size: 1.7rem; }
+    .display-5 { font-size: 1.5rem; }
+
+    /* コンタクトのソーシャルボタンを全幅で見やすく */
+    .contact-section .social-links .btn-social {
+        flex: 1 1 100%;
+        text-align: center;
+        margin-right: 0 !important;
+    }
 }

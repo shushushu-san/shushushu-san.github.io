@@ -81,8 +81,11 @@
     }
 
     // ツールチップ生成（マーカー/バーに紐づく）
-    function makeTooltip(ev, alignRight) {
-        var tip = el('div', 'tl-tooltip' + (alignRight ? ' tl-tooltip--right' : ''));
+    function makeTooltip(ev, alignRight, openDown) {
+        var cls = 'tl-tooltip';
+        if (alignRight) cls += ' tl-tooltip--right';
+        if (openDown) cls += ' tl-tooltip--down';
+        var tip = el('div', cls);
         var title = el('p', 'tl-tooltip__title');
         title.textContent = ev.title;
         var date = el('p', 'tl-tooltip__date');
@@ -98,7 +101,7 @@
     }
 
     // 単年イベント（円マーカー）
-    function makeMarker(ev, startYear, totalYears, color) {
+    function makeMarker(ev, startYear, totalYears, color, openDown) {
         var lp = leftPct(ev.start, startYear, totalYears);
         if (lp < -2 || lp > 102) return null;
 
@@ -113,12 +116,12 @@
         var dot = el('div', 'tl-marker__dot');
         ring.appendChild(dot);
         wrap.appendChild(ring);
-        wrap.appendChild(makeTooltip(ev, lp > 70));
+        wrap.appendChild(makeTooltip(ev, lp > 70, openDown));
         return wrap;
     }
 
     // 期間イベント（バー）
-    function makeBar(ev, startYear, totalYears, color) {
+    function makeBar(ev, startYear, totalYears, color, openDown) {
         var s = ev.start;
         var e = (ev.end == null ? ev.start : ev.end) + 1; // 終了年当年まで含む
         var viewEnd = startYear + totalYears;
@@ -139,7 +142,7 @@
 
         var body = el('div', 'tl-bar__body');
         wrap.appendChild(body);
-        wrap.appendChild(makeTooltip(ev, lp > 70));
+        wrap.appendChild(makeTooltip(ev, lp > 70, openDown));
         return wrap;
     }
 
@@ -199,7 +202,7 @@
             order = specified.concat(rest);
         }
 
-        order.forEach(function (cat) {
+        order.forEach(function (cat, rowIndex) {
             var color = getColor(cat);
             var row = el('div', 'tl-row');
 
@@ -215,13 +218,16 @@
             line.style.backgroundColor = withAlpha(color, '55');
             track.appendChild(line);
 
+            // 最上段の行はツールチップを下向きに開いて見切れを防ぐ
+            var openDown = (rowIndex === 0);
+
             // イベント（開始年でソート）
             groups[cat].sort(function (a, b) { return a.start - b.start; });
             groups[cat].forEach(function (ev) {
                 var isRange = (ev.end != null && ev.end !== ev.start);
                 var node = isRange
-                    ? makeBar(ev, startYear, totalYears, color)
-                    : makeMarker(ev, startYear, totalYears, color);
+                    ? makeBar(ev, startYear, totalYears, color, openDown)
+                    : makeMarker(ev, startYear, totalYears, color, openDown);
                 if (node) track.appendChild(node);
             });
 
