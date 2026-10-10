@@ -1,0 +1,44 @@
+name: Append RSSI
+
+on:
+  repository_dispatch:
+    types: [rssi]
+
+permissions:
+  contents: write
+
+# 同時に複数走ってもpushが衝突しないよう直列化
+concurrency:
+  group: rssi-append
+
+jobs:
+  append:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Append row to CSV
+        env:
+          P_ID: ${{ github.event.client_payload.id }}
+          P_PLACE: ${{ github.event.client_payload.place }}
+          P_TIME: ${{ github.event.client_payload.time }}
+          P_RSSI: ${{ github.event.client_payload.rssi }}
+          P_AP: ${{ github.event.client_payload.ap_count }}
+          P_BEST: ${{ github.event.client_payload.best_rssi }}
+        run: |
+          # 数値・文字種を検証してから追記（想定外の値は弾く）
+          [[ "$P_RSSI" =~ ^-?[0-9]+$ ]] || exit 1
+          [[ "$P_AP" =~ ^[0-9]+$ ]] || exit 1
+          [[ "$P_BEST" =~ ^-?[0-9]+$ ]] || exit 1
+          [[ "$P_ID$P_PLACE$P_TIME" =~ ^[A-Za-z0-9_:.-]*$ ]] || exit 1
+          mkdir -p rssi-test/data
+          [ -f rssi-test/data/rssi.csv ] || echo "id,place,time,rssi,ap_count,best_rssi" > rssi-test/data/rssi.csv
+          echo "$P_ID,$P_PLACE,$P_TIME,$P_RSSI,$P_AP,$P_BEST" >> rssi-test/data/rssi.csv
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add rssi-test/data/rssi.csv
+          git commit -m "rssi data" || exit 0
+          git push
