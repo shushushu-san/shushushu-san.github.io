@@ -44,4 +44,12 @@
         <priority>0.7</priority>
     </url>
     
+    <!-- 東北大学一限マップ -->
+    <url>
+        <loc>https://shushushu-san.github.io/work0005.html</loc>
+        <lastmod>2026-11-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
 </urlset>
